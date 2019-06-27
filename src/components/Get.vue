@@ -250,26 +250,6 @@
               <div class="md-caption">You should see the details then, if the transaction has been completed</div>
             </div>
           </md-tab>
-
-          <md-tab md-label="File Bundle">
-            <div class="txn-details" v-if="showBundle">
-              <img v-if="isImg" class="md-layout-item md-layout-item md-size-70 md-large-size-70 md-medium-size-80 md-small-size-80 md-xsmall-size-50 bundle-img" :src="imgData" alt="IMG"/>
-              <h4 v-if="!isImg">No Preview is Available</h4>
-              <md-field>
-                <label>IPFS Bundle Hash</label>
-                <md-input v-model="bundleHash" readonly></md-input>
-                <md-button class="md-icon-button md-mini" @click="downloadToLocal()">
-                  <md-icon>cloud_download</md-icon>
-                  <md-tooltip md-delay="500" md-direction="bottom">Download</md-tooltip>
-                </md-button>
-              </md-field>
-              <div class="md-caption">File Name: <strong>{{fileName}}</strong></div>
-              <div class="md-caption">File Size: <strong>{{fileSize}}</strong> bytes</div>
-            </div>
-            <div class="txn-details" v-else>
-              <div class="md-caption">Please wait...only if you have uploaded any file</div>
-            </div>
-          </md-tab>
         </md-tabs>
 
         <md-dialog-actions class="md-layout md-alignment-center-left">

@@ -1,10 +1,13 @@
 <template>
   <div class="page-container unselectable">
-    <md-app md-waterfall md-mode="fixed">
-      <md-app-toolbar class="md-primary" md-elevation="0">
+    <md-app md-waterfall md-mode="fixed-last">
+      <md-app-toolbar class="md-large md-dense md-primary tool-bar">
         <div class="md-toolbar-row">
           <div class="md-toolbar-section-start">
-            <span class="md-title">MY Demo</span>
+            <md-button class="md-icon-button" @click="menuVisible = !menuVisible">
+              <md-icon>menu</md-icon>
+            </md-button>
+            <span class="md-title unselectable car">My Demo</span>
           </div>
 
           <div class="md-toolbar-row">
@@ -131,19 +134,20 @@
 
       <md-app-drawer :md-active.sync="menuVisible">
         <md-toolbar class="md-transparent avatar" md-elevation="0">
-          <md-icon class="md-size-3x">track_changes</md-icon>
+          <md-icon class="md-size-3x">house</md-icon>
         </md-toolbar>
-        <div class="md-subheading title">MY DEMO</div>
-        <br>
+        <div id="menuTitle" class="md-subheading title md-size-3x">My Demo</div>
         <md-list>
           <md-list-item href="https://app.simbachain.com/" target="_blank" @click="menuVisible = false">
             <md-icon>apps</md-icon>
             <span class="md-list-item-text">SIMBA&#8482; Dashboard</span>
           </md-list-item>
+
           <md-list-item href="https://simbachain.com/contact/" target="_blank" @click="menuVisible = false">
             <md-icon>contact_support</md-icon>
             <span class="md-list-item-text">Contact Us</span>
           </md-list-item>
+
         </md-list>
       </md-app-drawer>
 
@@ -174,6 +178,9 @@
   }
   .wallet-content {
     margin: 20px;
+  }
+  #menuTitle {
+    text-align: center;
   }
 
 </style>

@@ -146,15 +146,6 @@
               </div>
             </div>
 
-            <div class="md-layout md-gutter">
-              <div class="md-layout-item md-size-50">
-                <md-field>
-                  <label>Attachment</label>
-                  <md-file name="attachment" id="attachment" v-model="attachment"/>
-                </md-field>
-              </div>
-            </div>
-
           </md-card-content>
 
           <md-progress-bar class="md-accent" md-mode="indeterminate" v-if="sending"/>
