@@ -1,8 +1,8 @@
 {
-  "name": "supply-logistics-demo",
+  "name": "house-demo",
   "version": "1.0.0",
-  "description": "A Vue.js project for supply-logistics-demo",
-  "author": "ihave2 <haoyan.eric.wu@gmail.com>",
+  "description": "A Vue.js project for house-demo",
+  "author": "<jacobfrautt@gmail.com>",
   "private": true,
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
@@ -78,10 +78,11 @@
     "vue-jest": "^1.0.2",
     "vue-loader": "^13.3.0",
     "vue-style-loader": "^3.1.2",
-    "vue-template-compiler": "^2.5.2",
+    "vue-template-compiler": "^2.6.10",
     "webpack": "^3.6.0",
     "webpack-bundle-analyzer": "^3.3.2",
-    "webpack-dev-server": "^3.1.11",
+    "webpack-cli": "^3.3.5",
+    "webpack-dev-server": "^2.9.7",
     "webpack-merge": "^4.1.0"
   },
   "engines": {

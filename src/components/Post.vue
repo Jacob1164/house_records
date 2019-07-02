@@ -15,7 +15,7 @@
             </md-card-media>
           </md-card-header>
           <md-card-content>
-            You need to select a party to begain
+            You need to select a group to begain
           </md-card-content>
 
         </md-ripple>
@@ -24,123 +24,188 @@
 
     <div v-if="!showWarning">
       <div class="post-form">
-        <md-card class="md-layout-item md-size-50 md-large-size-50 md-medium-size-70 md-small-size-90 md-xsmall-size-100">
+        <md-card class="md-layout-item md-size-90 md-large-size-80 md-medium-size-100 md-small-size-100 md-xsmall-size-100">
           <md-card-header>
-            <div v-if="showSC" class="title">Service Center</div>
-            <div v-if="showSU" class="title">Supplier</div>
-            <div v-if="showMF" class="title">Manufacturer</div>
+            <div v-if="showBD" class="title">Register a Home</div>
+            <div v-if="showRE" class="title">Real Estate Agent</div>
+            <div v-if="showIA" class="title">Insurance Agent</div>
+            <div v-if="showIN" class="title">Inspector</div>
+            <div v-if="showHO" class="title">House Owner</div>
           </md-card-header>
 
           <md-card-content class="post-card">
-            <div v-if="showSC" class="md-layout-item md-size-100">
-              <md-radio v-model="scAction" value="ship">
-                <strong style="color:#64dd17;">Ship Clean Container</strong>
-              </md-radio>
-              <md-radio v-model="scAction" value="recycle">
-                <strong style="color:#64dd17;">Recycle Container</strong>
-              </md-radio>
+            <div v-if="showBD" class="md-layout-item md-size-100">
+              <strong style="color:#64dd17;" id="setTest">Make sure to enter a valid address</strong>
             </div>
-            <div v-if="showSU" class="md-layout-item md-size-100">
-              <strong style="color:#64dd17;">Ship Container with Parts</strong>
+            <div v-if="showRE" class="md-layout-item md-size-100">
+              <strong style="color:#64dd17;">Log A Sold House</strong>
             </div>
-            <div v-if="showMF" class="md-layout-item md-size-100">
-              <strong style="color:#64dd17;">Ship Dirty Container</strong>
+            <div v-if="showIA" class="md-layout-item md-size-100">
+              <strong style="color:#64dd17;">File An Accident</strong>
             </div>
-
-            <div v-if="scAction == 'ship' || !showSC">
-              <div class="md-layout md-gutter">
-                <div class="md-layout-item md-size-50">
-                  <md-field>
-                    <label for="inventoryType">Inventory Type</label>
-                    <md-input name="inventoryType" id="inventoryType" v-model="form1.inventoryType" :disabled="sending" />
-                  </md-field>
-                </div>
-                <div class="md-layout-item md-size-50">
-                  <md-field>
-                    <label for="inventoryQty">Inventory Quantity</label>
-                    <md-input name="inventoryQty" id="inventoryQty" v-model="form1.inventoryQty" :disabled="sending" />
-                  </md-field>
-                </div>
-              </div>
-              <div class="md-layout md-gutter">
-                <div class="md-layout-item md-size-33">
-                  <md-field>
-                    <label>Number</label>
-                    <md-input name="number" id="number" v-model="form1.number" :disabled="sending" />
-                  </md-field>
-                </div>
-                <div class="md-layout-item md-size-33">
-                  <md-field>
-                    <label>Quantity</label>
-                    <md-input name="quantity" id="quantity" v-model="form1.quantity" :disabled="sending" />
-                  </md-field>
-                </div>
-                <div class="md-layout-item md-size-33">
-                  <md-field>
-                    <label>Part No.</label>
-                    <md-input name="partNo" id="partNo" v-model="form1.partNo" :disabled="sending" />
-                  </md-field>
-                </div>
-              </div>
-
-              <div class="md-layout md-gutter">
-                <div class="md-layout-item md-size-33">
-                  <md-field>
-                    <label>BOL</label>
-                    <md-input name="bol" id="bol" v-model="form1.bol" :disabled="sending" />
-                  </md-field>
-                </div>
-                <div class="md-layout-item md-size-33">
-                  <md-field>
-                    <label>PO No.</label>
-                    <md-input name="poNo" id="poNo" v-model="form1.poNo" :disabled="sending" />
-                  </md-field>
-                </div>
-                <div class="md-layout-item md-size-33">
-                  <md-field>
-                    <label>Tm Load No.</label>
-                    <md-input name="tmLoadNo" id="tmLoadNo" v-model="form1.tmLoadNo" :disabled="sending" />
-                  </md-field>
-                </div>
-              </div>
-
-              <div class="md-layout md-gutter">
-                <div class="md-layout-item md-size-50">
-                  <md-field>
-                    <label>Supplier</label>
-                    <md-input name="supplier" id="supplier" v-model="form1.supplier" :disabled="sending" />
-                  </md-field>
-                </div>
-                <div v-if="!showMF" class="md-layout-item md-size-50">
-                  <md-field>
-                    <label>Smart Track Txn No.</label>
-                    <md-input name="smartTrackTxnNo" id="smartTrackTxnNo" v-model="form1.smartTrackTxnNo" :disabled="sending" />
-                  </md-field>
-                </div>
-              </div>
-
+            <div v-if="showIN" class="md-layout-item md-size-100">
+              <strong style="color:#64dd17;">File An Inspection</strong>
+            </div>
+            <div v-if="showHO" class="md-layout-item md-size-100">
+              <strong style="color:#64dd17;">Report A Home Improvement</strong>
             </div>
 
-            <div v-if="scAction == 'recycle'">
+            <div class="md-layout md-gutter">
+              <div class="md-layout-item md-size-80">
+                <md-field>
+                  <label for="address">Address</label>
+                  <md-input v-if="showBD" name="address" id="address1" v-model="form1.addresss" :disabled="sending" placeholder=""/> <!--v-on:change="set" -->
+                  <md-input v-if="showRE" name="address" id="address2" v-model="form2.addresss" :disabled="sending" />
+                  <md-input v-if="showIA" name="address" id="address3" v-model="form3.addresss" :disabled="sending" />
+                  <md-input v-if="showIN" name="address" id="address4" v-model="form4.addresss" :disabled="sending" />
+                  <md-input v-if="showHO" name="address" id="address5" v-model="form5.addresss" :disabled="sending" />
+                </md-field>
+              </div>
+              <div class="md-layout-item md-size-20">
+
+                  <md-datepicker v-if="showBD" name="date" id="date1" v-model="form1.date" :disabled="sending" />
+                  <md-datepicker v-if="showRE" name="date" id="date2" v-model="form2.date" :disabled="sending" />
+                  <md-datepicker v-if="showIA" name="date" id="date3" v-model="form3.date" :disabled="sending" />
+                  <md-datepicker v-if="showIN" name="date" id="date4" v-model="form4.date" :disabled="sending" />
+                  <md-datepicker v-if="showHO" name="date" id="date5" v-model="form5.date" :disabled="sending" />
+
+              </div>
+            </div>
+
+            <div v-if="showBD">
+              <div class="md-layout md-gutter">
+                <div class="md-layout-item md-size-100">
+                  <md-field>
+                    <label for="builder">Builder's Name</label>
+                    <md-input name="builder" id="builder" v-model="form1.builder" :disabled="sending" />
+                  </md-field>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="showRE">
               <div class="md-layout md-gutter">
                 <div class="md-layout-item md-size-50">
                   <md-field>
-                    <label for="inventoryType">Inventory Type</label>
-                    <md-input name="inventoryType" id="inventoryType" v-model="form2.inventoryType" :disabled="sending" />
+                    <label for="previousOwner">Previous Owner</label>
+                    <md-input name="previousOwner" id="previousOwner" v-model="form2.previousOwner" :disabled="sending" />
                   </md-field>
                 </div>
                 <div class="md-layout-item md-size-50">
                   <md-field>
-                    <label for="inventoryQty">Inventory Quantity</label>
-                    <md-input name="inventoryQty" id="inventoryQty" v-model="form2.inventoryQty" :disabled="sending" />
+                    <label for="newOWner">New Owner</label>
+                    <md-input name="newOWner" id="danewOWnerte" v-model="form2.newOWner" :disabled="sending" />
                   </md-field>
                 </div>
               </div>
               <div class="md-layout md-gutter">
                 <div class="md-layout-item md-size-50">
                   <md-field>
-                    <label>Destination Service Center</label>
-                    <md-input name="destinationServiceCenter" id="destinationServiceCenter" v-model="form2.destinationServiceCenter" :disabled="sending" />
+                    <label for="agentName">Real Estate Agent's Name</label>
+                    <md-input name="agentName" id="agentName" v-model="form2.agentName" :disabled="sending" />
+                  </md-field>
+                </div>
+                <div class="md-layout-item md-size-50">
+                  <md-field>
+                    <label for="price">Price</label>
+                    <md-input name="price" id="price" v-model="form2.price" :disabled="sending" />
+                  </md-field>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="showIA">
+              <div class="md-layout md-gutter">
+                <div class="md-layout-item md-size-66">
+                  <md-field>
+                    <label for="incident">Type of Incident</label>
+                    <md-input name="incident" id="incident" v-model="form3.incident" :disabled="sending" />
+                  </md-field>
+                </div>
+                <div class="md-layout-item md-size-33">
+                  <md-field>
+                    <label for="damages">Estimated Damages ($)</label>
+                    <md-input name="damages" id="damages" v-model="form3.damages" :disabled="sending" />
+                  </md-field>
+                </div>
+              </div>
+              <div class="md-layout md-gutter">
+                <div class="md-layout-item md-size-50">
+                  <md-field>
+                    <label for="agentName">Insurance Agent's Name</label>
+                    <md-input name="agentName" id="agentName" v-model="form3.agentName" :disabled="sending" />
+                  </md-field>
+                </div>
+                <div class="md-layout-item md-size-50">
+                  <md-field>
+                    <label for="owner">Owner</label>
+                    <md-input name="owner" id="owner" v-model="form3.owner" :disabled="sending" />
+                  </md-field>
+                </div>
+              </div>
+              <div class="md-layout md-gutter">
+                <div class="md-layout-item md-size-100">
+                  <md-field>
+                    <label for="notes">Notes</label>
+                    <md-textarea class="md-textarea" name="notes" id="notes" v-model="form3.notes" :disabled="sending"></md-textarea>
+                  </md-field>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="showIN">
+              <div class="md-layout md-gutter">
+                <div class="md-layout-item md-size-66">
+                  <md-field>
+                    <label for="inspectorName">Inspector's Name</label>
+                    <md-input name="inspectorName" id="inspectorName" v-model="form4.inspectorName" :disabled="sending" />
+                  </md-field>
+                </div>
+                <div class="md-layout-item md-size-33">
+                  <md-field>
+                    <label for="value">House's Value ($)</label>
+                    <md-input name="value" id="value" v-model="form4.value" :disabled="sending" />
+                  </md-field>
+                </div>
+              </div>
+              <div class="md-layout md-gutter">
+                <div class="md-layout-item md-size-100">
+                  <md-field>
+                    <label for="notes">Notes</label>
+                    <md-textarea class="md-textarea" name="notes" id="notes" v-model="form4.notes" :disabled="sending"></md-textarea>
+                  </md-field>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="showHO">
+              <div class="md-layout md-gutter">
+                <div class="md-layout-item md-size-50">
+                  <md-field>
+                    <label for="owner">Owner</label>
+                    <md-input name="owner" id="owner" v-model="form5.owner" :disabled="sending" />
+                  </md-field>
+                </div>
+                <div class="md-layout-item md-size-50">
+                  <md-field>
+                    <label for="valueAdded">Value Added to House ($)</label>
+                    <md-input name="valueAdded" id="valueAdded" v-model="form5.valueAdded" :disabled="sending" />
+                  </md-field>
+                </div>
+              </div>
+              <div class="md-layout md-gutter">
+                <div class="md-layout-item md-size-100">
+                  <md-field>
+                    <label for="improvement">Improvement made</label>
+                    <md-input name="improvement" id="improvement" v-model="form5.improvement" :disabled="sending" />
+                  </md-field>
+                </div>
+              </div>
+              <div class="md-layout md-gutter">
+                <div class="md-layout-item md-size-100">
+                  <md-field>
+                    <label for="notes">Notes</label>
+                    <md-textarea class="md-textarea" name="notes" id="notes" v-model="form5.notes" :disabled="sending"></md-textarea>
                   </md-field>
                 </div>
               </div>
@@ -151,9 +216,11 @@
           <md-progress-bar class="md-accent" md-mode="indeterminate" v-if="sending"/>
 
           <md-card-actions>
-            <md-button v-if="scAction == 'ship' || showSU" type="submit" class="md-accent md-raised" :disabled="!(form1.inventoryType && form1.inventoryQty && form1.number && form1.quantity && form1.supplier && form1.smartTrackTxnNo && form1.tmLoadNo && form1.bol && form1.poNo && form1.partNo)"  v-on:click="saveRecord()">Submit</md-button>
-            <md-button v-if="showMF" type="submit" class="md-accent md-raised" :disabled="!(form1.inventoryType && form1.inventoryQty && form1.number && form1.quantity && form1.supplier && form1.tmLoadNo && form1.bol && form1.poNo && form1.partNo)"  v-on:click="saveRecord()">Submit</md-button>
-            <md-button v-if="scAction == 'recycle'" type="submit" class="md-accent md-raised" :disabled="!(form2.inventoryType && form2.inventoryQty && form2.destinationServiceCenter)"  v-on:click="saveRecord()">Submit</md-button>
+            <md-button v-if="showBD" type="submit" class="md-accent md-raised" :disabled="!(form1.addresss && form1.date && form1.builder && form1.lat && form1.lng)"  v-on:click="saveRecord()">Submit</md-button>
+            <md-button v-if="showRE" type="submit" class="md-accent md-raised" :disabled="!(form2.addresss && form2.date && form2.previousOwner && form2.newOWner && form2.agentName && form2.price)"  v-on:click="saveRecord()">Submit</md-button>
+            <md-button v-if="showIA" type="submit" class="md-accent md-raised" :disabled="!(form3.addresss && form3.date && form3.incident && form3.owner && form3.agentName && form3.damages && form3.notes)"  v-on:click="saveRecord()">Submit</md-button>
+            <md-button v-if="showIN" type="submit" class="md-accent md-raised" :disabled="!(form4.addresss && form4.date && form4.inspectorName && form4.value && form4.notes)"  v-on:click="saveRecord()">Submit</md-button>
+            <md-button v-if="showHO" type="submit" class="md-accent md-raised" :disabled="!(form5.addresss && form5.date && form5.owner && form5.improvement && form5.valueAdded && form5.notes)"  v-on:click="saveRecord()">Submit</md-button>
           </md-card-actions>
         </md-card>
 
@@ -168,6 +235,7 @@
 </template>
 
 <script>
+/* eslint-disable */
 import { localstorage } from './mixins/localstorage'
 import ethers from 'ethers'
 import simbaApi from './gateways/simba-api'
@@ -180,6 +248,28 @@ export default {
       return
     }
     this.changePost(localStorage.getItem('role'))
+
+    let self = this
+
+    setTimeout(function () {
+      var autocomplete
+      autocomplete = new google.maps.places.Autocomplete(document.getElementById('address1'))
+      autocomplete.setFields(['address_component', 'geometry', 'formatted_address'])
+      autocomplete.addListener('place_changed', function () {
+        var place = autocomplete.getPlace()
+        if (!place.geometry) {
+          window.alert("No details available for input: '" + place.name + "'")
+          document.getElementById('address1').value = ''
+          return
+        } else if (place.address_components[0].types[0] != 'street_number') {
+          window.alert("All house address must start with a street number.")
+          document.getElementById('address1').value = ''
+          return
+        } else {
+            self.set(place.formatted_address)
+        }
+      })
+    }, 1)
   },
   mixins: [localstorage],
 
@@ -192,36 +282,82 @@ export default {
     accountBalance: null,
     txnId: null,
     unsignedTxn: null,
-    showSC: false,
-    showSU: false,
-    showMF: false,
+    showBD: false,
+    showRE: false,
+    showIA: false,
+    showIN: false,
+    showHO: false,
     showWarning: true,
 
     form1: {
-      inventoryType: null,
-      inventoryQty: null,
-      number: null,
-      quantity: null,
-      supplier: null,
-      smartTrackTxnNo: null,
-      tmLoadNo: null,
-      bol: null,
-      poNo: null,
-      partNo: null
+      lat: null,
+      lng: null,
+      date: null,
+      assetId: 10,
+      builder: null,
+      addresss: null,
+
+
     },
 
     form2: {
-      inventoryType: null,
-      inventoryQty: null,
-      destinationServiceCenter: null
+      addresss: null,
+      previousOwner: null,
+      newOwner: null,
+      agentName: null,
+      price: null,
+      date: null
     },
 
-    attachment: null
+    form3: {
+      addresss: null,
+      incident: null,
+      owner: null,
+      agentName: null,
+      damages: null,
+      date: null,
+      notes: null
+    },
+
+    form4: {
+      addresss: null,
+      inspectorName: null,
+      value: null,
+      date: null,
+      notes: null
+    },
+
+    form5: {
+      addresss: null,
+      owner: null,
+      improvement: null,
+      valueAdded: null,
+      date: null,
+      notes: null
+    }
+
   }),
   methods: {
     getCurrentWallet () {
       this.unlockWallet()
     },
+
+    set (address) {
+      let self = this
+      self.form1.addresss = address
+      var geocoder = new google.maps.Geocoder()
+      geocoder.geocode( { 'address': address}, function(results, status) {
+        if (status == 'OK') {
+          var lat = results[0].geometry.viewport.na
+          var lng = results[0].geometry.viewport.ga
+          self.form1.lat = (lat.j + lat.l) / 2
+          self.form1.lng = (lat.j + lat.l) / 2
+        } else {
+          console.log('Geocode was not successful for the following reason: ' + status);
+        }
+      })
+    },
+
     unlockWallet () {
       try {
         let mnemonic = this.getWallet()
@@ -249,43 +385,78 @@ export default {
     },
     changePost (post) {
       switch (post) {
-        case 'sc':
-          this.showSC = true
-          this.showSU = false
-          this.showMF = false
+        case 'bd':
+          this.showBD = true
+          this.showRE = false
+          this.showIA = false
+          this.showIN = false
+          this.showHO = false
           this.showWarning = false
           break
-        case 'su':
-          this.showSC = false
-          this.showSU = true
-          this.showMF = false
+        case 're':
+          this.showBD = false
+          this.showRE = true
+          this.showIA = false
+          this.showIN = false
+          this.showHO = false
           this.showWarning = false
           break
-        case 'mf':
-          this.showSC = false
-          this.showSU = false
-          this.showMF = true
+        case 'ia':
+          this.showBD = false
+          this.showRE = false
+          this.showIA = true
+          this.showIN = false
+          this.showHO = false
+          this.showWarning = false
+          break
+        case 'in':
+          this.showBD = false
+          this.showRE = false
+          this.showIA = false
+          this.showIN = true
+          this.showHO = false
+          this.showWarning = false
+          break
+        case 'ho':
+          this.showBD = false
+          this.showRE = false
+          this.showIA = false
+          this.showIN = false
+          this.showHO = true
           this.showWarning = false
           break
       }
     },
     clearForm () {
-      this.form1.inventoryType = null
-      this.form1.inventoryQty = null
-      this.form1.number = null
-      this.form1.quantity = null
-      this.form1.supplier = null
-      this.form1.smartTrackTxnNo = null
-      this.form1.tmLoadNo = null
-      this.form1.bol = null
-      this.form1.poNo = null
-      this.form1.partNo = null
-
-      this.form2.inventoryType = null
-      this.form2.inventoryQty = null
-      this.form2.destinationServiceCenter = null
-
-      this.attachment = null
+      this.form1.addresss = null
+      this.form1.builder = null
+      this.form1.date = null
+      this.form1.lat = null
+      this.form1.lng = null
+      this.form2.addresss = null
+      this.form2.previousOwner = null
+      this.form2.newOWner = null
+      this.form2.agentName = null
+      this.form2.price = null
+      this.form2.date = null
+      this.form3.addresss = null
+      this.form3.incident = null
+      this.form3.owner = null
+      this.form3.agentName = null
+      this.form3.damages = null
+      this.form3.date = null
+      this.form3.notes = null
+      this.form4.addresss = null
+      this.form4.inspectorName = null
+      this.form4.value = null
+      this.form4.date = null
+      this.form4.notes = null
+      this.form5.addresss = null
+      this.form5.owner = null
+      this.form5.improvement = null
+      this.form5.valueAdded = null
+      this.form5.date = null
+      this.form5.notes = null
     },
     saveRecord (e) {
       if (!this.getWallet()) {
@@ -297,44 +468,46 @@ export default {
       let bodyFormData = new FormData()
       bodyFormData.append('from', this.getAddress())
 
-      if (this.attachment) {
-        bodyFormData.append('file[0]', document.getElementById('attachment').files[0])
-      }
-
-      bodyFormData.append('assetId', 'usedToGenerateGraph,butYouCanIgnoreItAndFillWithAnything')
-
       let method = null
 
-      if (this.showSC) {
-        if (this.scAction === 'recycle') {
-          method = 'recycleContainer'
-        } else if (this.scAction === 'ship') {
-          method = 'shipCleanContainer'
-        } else {
-          return
-        }
-      } else if (this.showSU) {
-        method = 'shipContainerWithParts'
-      } else if (this.showMF) {
-        method = 'shipDirtyContainer'
-      } else {
-        return
-      }
-
-      if (method === 'recycleContainer') {
-        for (let k in this.form2) {
-          if (this.form2.hasOwnProperty(k)) {
-            bodyFormData.append(k, this.form2[k])
-          }
-        }
-      } else {
+      if (this.showBD) {
+        method = 'new_house'
         for (let k in this.form1) {
           if (this.form1.hasOwnProperty(k)) {
             bodyFormData.append(k, this.form1[k])
           }
         }
+      } else if (this.showRE) {
+        method = 'houseSale'
+        for (let k in this.form2) {
+          if (this.form2.hasOwnProperty(k)) {
+            bodyFormData.append(k, this.form2[k])
+          }
+        }
+      } else if (this.showIA) {
+        method = 'accident'
+        for (let k in this.form3) {
+          if (this.form3.hasOwnProperty(k)) {
+            bodyFormData.append(k, this.form3[k])
+          }
+        }
+      } else if (this.showIN) {
+        method = 'appraisal'
+        for (let k in this.form4) {
+          if (this.form4.hasOwnProperty(k)) {
+            bodyFormData.append(k, this.form4[k])
+          }
+        }
+      } else {
+        method = 'improvement'
+        for (let k in this.form5) {
+          if (this.form5.hasOwnProperty(k)) {
+            bodyFormData.append(k, this.form5[k])
+          }
+        }
       }
 
+      console.log(bodyFormData)
       let self = this
       try {
         simbaApi.postData(method + '/', bodyFormData).then(function (res) {
@@ -351,6 +524,8 @@ export default {
     }
   }
 }
+
+
 </script>
 
 <style scoped>

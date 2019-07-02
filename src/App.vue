@@ -7,7 +7,7 @@
             <md-button class="md-icon-button" @click="menuVisible = !menuVisible">
               <md-icon>menu</md-icon>
             </md-button>
-            <span class="md-title unselectable car">My Demo</span>
+            <span class="md-title unselectable car">House Demo</span>
           </div>
 
           <div class="md-toolbar-row">
@@ -136,7 +136,7 @@
         <md-toolbar class="md-transparent avatar" md-elevation="0">
           <md-icon class="md-size-3x">house</md-icon>
         </md-toolbar>
-        <div id="menuTitle" class="md-subheading title md-size-3x">My Demo</div>
+        <div id="menuTitle" class="md-subheading title md-size-3x">House Demo</div>
         <md-list>
           <md-list-item href="https://app.simbachain.com/" target="_blank" @click="menuVisible = false">
             <md-icon>apps</md-icon>

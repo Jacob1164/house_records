@@ -15,7 +15,7 @@
             </md-card-media>
           </md-card-header>
           <md-card-content>
-            You need to select a party to begain
+            You need to select a group to begain
           </md-card-content>
 
         </md-ripple>
