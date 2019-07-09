@@ -1,6 +1,6 @@
-# supply-logistics-demo
+# House Records Demo
 
-> A simple demo shows how to use SIMBA API to post and get info to/from a private blockchain(Circle of Life).An Ethereum account is auto generated and Ethers are auto deposited, if no wallet is detected on user's browser under this domain. This demo auto signs the transaction with your Ethereum account when a post being made. 
+> A simple demo shows how to use SIMBA API to post and get info to/from a private blockchain(Circle of Life).An Ethereum account is auto generated and Ethers are auto deposited, if no wallet is detected on user's browser under this domain. This demo auto signs the transaction with your Ethereum account when a post being made.
 
 
 ## Build Setup
@@ -9,7 +9,7 @@
 # install dependencies
 npm install
 
-# create and configure an app on Simba Dashboard 
+# create and configure an app on Simba Dashboard
 # with the `supply-logistics-demo.sol` smart contract
 # at https://app.simbachain.com/
 
@@ -21,27 +21,17 @@ npm install
 
 # serve with hot reload at localhost:8080
 npm run dev
-
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
-
-# run e2e tests
-npm run e2e
-
-# run all tests
-npm test
 ```
 
-## What you can find out from this demo
-
-1. How to create/restore an Ethereum account and save it into browser's localstorage 
-2. How to deposit Ethers to an Ethereum account on a private blockchain with Configuration(management) API
-2. How to use SIMBA API to post information/file to a private blockchain
-3. How to use SIMBA API to retreive information/file from a private blockchain
-4. How to use SIMBA API to query transcations with different serach conditions
+##About This demo
+*This version of the demo has a working home page with a map that contains pins and info windows for all registered houses.
+*If you go to the link on a house's info window, you will be able to see a list of all transactions for that house.
+*On the register page, any person can type in an address and add the house to the list of registered houses.
+*There is a sign up and a log in page.
+*Once logged in as a specific role (Real estate agent, insurance agent, inspector, or home owner) the user can add the make their corresponding transaction to any registered house.
+*Additional features include:
+...*Google Maps Autocomplete on the home and register pages
+...*Google Maps Static in both map and street view on each house's page
+...*Not allowing the user to select a date in the future, or a date before the house was built for any non-registering transactions
+...*General protection against form misuse
+...*And of course: all files stored on SIMBA's Circle-of-Life Ethereum blockchain, ensuring security and reliability

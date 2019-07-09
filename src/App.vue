@@ -1,24 +1,31 @@
 <template>
   <div class="page-container unselectable">
     <md-app md-waterfall md-mode="fixed-last">
-      <md-app-toolbar class="md-large md-dense md-primary tool-bar">
+      <md-app-toolbar class="md-dense md-primary tool-bar">
         <div class="md-toolbar-row">
           <div class="md-toolbar-section-start">
             <md-button class="md-icon-button" @click="menuVisible = !menuVisible">
               <md-icon>menu</md-icon>
             </md-button>
-            <span class="md-title unselectable car">House Demo</span>
+            <h3 class="md-title">House Demo</h3>
+            <md-button to="/">Home</md-button>
+            <md-button to="/register">Register a House</md-button>
+            <md-button v-if="loggedIn" to="/post">Add Records</md-button>
           </div>
 
-          <div class="md-toolbar-row">
-              <md-tabs class="md-primary">
-                <md-tab id="Home" md-label="Home" to="Home"></md-tab>
-                <md-tab id="Post" md-label="Post" to="Post"></md-tab>
-                <md-tab id="Get" md-label="Get" to="Get"></md-tab>
-              </md-tabs>
-            </div>
-
           <div class="md-toolbar-section-end">
+            <span v-if="loggedIn">
+              <md-button class="md-icon-button" @click="setAccount(true)">
+                <md-icon>account_circle</md-icon>
+              </md-button>
+              <md-tooltip md-delay="500" md-direction="left">Account</md-tooltip>
+            </span>
+            <span>
+              <md-button class="md-icon-button" @click="setInfo(true)">
+                <md-icon>info</md-icon>
+              </md-button>
+              <md-tooltip md-delay="500" md-direction="left">Info</md-tooltip>
+            </span>
             <span>
               <md-button class="md-icon-button" @click="showWallet(true)">
                 <span v-if="hasWallet">
@@ -30,9 +37,41 @@
               </md-button>
               <md-tooltip md-delay="500" md-direction="left">Wallet</md-tooltip>
             </span>
+            <md-button v-if="loggedIn" id="logout" @click="logout()">Log Out</md-button>
+            <md-button v-if="!loggedIn" to="/account/login" id="log">Log in</md-button>
+            <md-button v-if="!loggedIn" to="/account/signup" id="sign">Sign up</md-button>
           </div>
 
-          <md-dialog class="wallet" :md-click-outside-to-close=false :md-active.sync="isWallet">
+          <md-dialog :md-active.sync="info">
+            <md-toolbar class="md-accent md-dense">
+              <h3 class="md-title" style="flex: 1">Website Info</h3>
+              <md-button class="md-icon-button" @click="setInfo(false)">
+                <md-icon>close</md-icon>
+              </md-button>
+            </md-toolbar>
+            <div class="md-body-2 space">
+              <div>Use the map on the main page to find a registered house.</div>
+              <div>If you click on a pin, you can go to a page with all the records for that house.</div>
+              <div>Go the register a house page to add a new house to the map.</div>
+              <div>Login/Sign up as either a real estate agent, insurance agent, inspector, or home owner to add records to a house.</div>
+            </div>
+          </md-dialog>
+
+          <md-dialog :md-active.sync="account">
+            <md-toolbar class="md-accent md-dense">
+              <h3 class="md-title" style="flex: 1">Account Info</h3>
+              <md-button class="md-icon-button" @click="setAccount(false)">
+                <md-icon>close</md-icon>
+              </md-button>
+            </md-toolbar>
+            <div class="space">
+              <div class="md-title">{{accountInfo.first}} {{accountInfo.last}}</div>
+              <div class="md-body-1"><strong>Email: </strong>{{accountInfo.email}}</div>
+              <div class="md-body-1"><strong>Role: </strong>{{accountInfo.role}}</div>
+            </div>
+          </md-dialog>
+
+          <md-dialog class="wallet" :md-active.sync="isWallet">
             <md-toolbar class="md-accent md-dense">
               <h3 class="md-title" style="flex: 1">Ethereum Wallet</h3>
                 <md-button class="md-icon-button" @click="setWalletStatus('close')">
@@ -142,12 +181,10 @@
             <md-icon>apps</md-icon>
             <span class="md-list-item-text">SIMBA&#8482; Dashboard</span>
           </md-list-item>
-
-          <md-list-item href="https://simbachain.com/contact/" target="_blank" @click="menuVisible = false">
-            <md-icon>contact_support</md-icon>
-            <span class="md-list-item-text">Contact Us</span>
+          <md-list-item href="https://developers.google.com/maps/documentation/" target="_blank" @click="menuVisible = false">
+            <md-icon>place</md-icon>
+            <span class="md-list-item-text">Google Maps API</span>
           </md-list-item>
-
         </md-list>
       </md-app-drawer>
 
@@ -167,11 +204,7 @@
   }
   .unselectable {
     user-drag: none;
-    user-select: none;
-    -moz-user-select: none;
     -webkit-user-drag: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
   }
   .wallet {
     min-width: 320px;
@@ -182,35 +215,83 @@
   #menuTitle {
     text-align: center;
   }
-
+  .space {
+    padding: 8px;
+  }
 </style>
 
 <script>
+/* eslint-disable */
 import { localstorage } from './components/mixins/localstorage'
 import manageApi from './components/gateways/manage-api'
+import simbaApi from './components/gateways/simba-api'
 import ethers from 'ethers'
 
 export default {
   name: 'App',
   mixins: [localstorage],
-  data: () => ({
-    restoreSeed: null,
-    invalidSeed: null,
-    accountAddress: null,
-    accountPk: null,
-    accountSeed: null,
-    menuVisible: false,
-    isRevealed: false,
-    isWallet: false,
-    isCreate: false,
-    isRestore: false,
-    isUnlock: false,
-    isCheck: false,
-    hasWallet: false,
-    createdWallet: false,
-    depositedWallet: false
-  }),
+  data () {
+    return {
+      restoreSeed: null,
+      invalidSeed: null,
+      accountAddress: null,
+      accountPk: null,
+      accountSeed: null,
+      menuVisible: false,
+      isRevealed: false,
+      isWallet: false,
+      isCreate: false,
+      isRestore: false,
+      isUnlock: false,
+      isCheck: false,
+      hasWallet: false,
+      createdWallet: false,
+      depositedWallet: false,
+      info: false,
+      account: false,
+      accountInfo: {
+        first: null,
+        last: null,
+        email: null,
+        role: null
+      },
+      loggedIn: false
+    }
+  },
   methods: {
+    setInfo (status) {
+      this.info = status
+    },
+
+    setAccount (status) {
+      this.account = status
+      if (status === true) {
+        let self = this
+        let url = 'create_user/?assetId_exact=' + localStorage.getItem('assetId')
+        try {
+          simbaApi.getData(url)
+            .then(function (response) {
+              let results = response.data.results
+              self.accountInfo.first = results[0].payload.inputs.first
+              self.accountInfo.last = results[0].payload.inputs.last
+              self.accountInfo.email = results[0].payload.inputs.email
+              let role = results[0].payload.inputs.role
+              if (role == 'ia') {
+                self.accountInfo.role = 'Insurance Agent'
+              } else if (role == 'in') {
+                self.accountInfo.role = 'Inspector'
+              } else if (role == 're') {
+                self.accountInfo.role = 'Real Estate Agent'
+              } else {
+                self.accountInfo.role = 'Home Owner'
+              }
+            })
+        } catch (e) {
+          console.log(e)
+        }
+      }
+    },
+
     setWalletStatus (status) {
       switch (status) {
         case 'create':
@@ -330,6 +411,12 @@ export default {
     },
     toggleMenu () {
       this.menuVisible = !this.menuVisible
+    },
+    logout () {
+      this.loggedIn = false
+      localStorage.setItem('loggedIn', false)
+      localStorage.setItem('role', '')
+      this.$router.push('/')
     }
   },
   mounted () {
@@ -337,6 +424,10 @@ export default {
       this.createWallet()
       this.createdWallet = true
     }
+    if(localStorage.getItem('loggedIn') == true) {
+      this.loggedIn = true
+    }
+
     this.getCurrentWallet()
   }
 }

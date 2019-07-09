@@ -1,32 +1,9 @@
 <template>
   <div>
-    <div v-if="showWarning">
-      <md-card class="my-card" md-with-hover>
-        <md-ripple>
-          <md-card-header>
-            <md-card-header-text>
-              <div class="md-title">Warning</div>
-              <div class="md-subhead">Please go back to Home Page</div>
-            </md-card-header-text>
-            <md-card-media>
-              <md-icon class="md-size-3x">
-                warning
-              </md-icon>
-            </md-card-media>
-          </md-card-header>
-          <md-card-content>
-            You need to select a group to begain
-          </md-card-content>
-
-        </md-ripple>
-      </md-card>
-    </div>
-
-    <div v-if="!showWarning">
+    <div v-if="loggedIn">
       <div class="post-form">
         <md-card class="md-layout-item md-size-90 md-large-size-80 md-medium-size-100 md-small-size-100 md-xsmall-size-100">
           <md-card-header>
-            <div v-if="showBD" class="title">Register a Home</div>
             <div v-if="showRE" class="title">Real Estate Agent</div>
             <div v-if="showIA" class="title">Insurance Agent</div>
             <div v-if="showIN" class="title">Inspector</div>
@@ -34,9 +11,6 @@
           </md-card-header>
 
           <md-card-content class="post-card">
-            <div v-if="showBD" class="md-layout-item md-size-100">
-              <strong style="color:#64dd17;" id="setTest">Make sure to enter a valid address</strong>
-            </div>
             <div v-if="showRE" class="md-layout-item md-size-100">
               <strong style="color:#64dd17;">Log A Sold House</strong>
             </div>
@@ -49,37 +23,13 @@
             <div v-if="showHO" class="md-layout-item md-size-100">
               <strong style="color:#64dd17;">Report A Home Improvement</strong>
             </div>
-
+              <div class="md-body-2"><br>Don't see the address you're looking for? Make sure to register the home first!</div>
             <div class="md-layout md-gutter">
               <div class="md-layout-item md-size-80">
-                <md-field>
-                  <label for="address">Address</label>
-                  <md-input v-if="showBD" name="address" id="address1" v-model="form1.addresss" :disabled="sending" placeholder=""/> <!--v-on:change="set" -->
-                  <md-input v-if="showRE" name="address" id="address2" v-model="form2.addresss" :disabled="sending" />
-                  <md-input v-if="showIA" name="address" id="address3" v-model="form3.addresss" :disabled="sending" />
-                  <md-input v-if="showIN" name="address" id="address4" v-model="form4.addresss" :disabled="sending" />
-                  <md-input v-if="showHO" name="address" id="address5" v-model="form5.addresss" :disabled="sending" />
-                </md-field>
+                <md-autocomplete name="address" id="address" v-model="address" :disabled="sending" :md-options="houses" md-dense><label>Search for a registered address</label></md-autocomplete>
               </div>
               <div class="md-layout-item md-size-20">
-
-                  <md-datepicker v-if="showBD" name="date" id="date1" v-model="form1.date" :disabled="sending" />
-                  <md-datepicker v-if="showRE" name="date" id="date2" v-model="form2.date" :disabled="sending" />
-                  <md-datepicker v-if="showIA" name="date" id="date3" v-model="form3.date" :disabled="sending" />
-                  <md-datepicker v-if="showIN" name="date" id="date4" v-model="form4.date" :disabled="sending" />
-                  <md-datepicker v-if="showHO" name="date" id="date5" v-model="form5.date" :disabled="sending" />
-
-              </div>
-            </div>
-
-            <div v-if="showBD">
-              <div class="md-layout md-gutter">
-                <div class="md-layout-item md-size-100">
-                  <md-field>
-                    <label for="builder">Builder's Name</label>
-                    <md-input name="builder" id="builder" v-model="form1.builder" :disabled="sending" />
-                  </md-field>
-                </div>
+                <md-datepicker name="date" id="date" v-model="date" :disabled="sending" md-immediately/>
               </div>
             </div>
 
@@ -87,28 +37,29 @@
               <div class="md-layout md-gutter">
                 <div class="md-layout-item md-size-50">
                   <md-field>
-                    <label for="previousOwner">Previous Owner</label>
-                    <md-input name="previousOwner" id="previousOwner" v-model="form2.previousOwner" :disabled="sending" />
+                    <label for="prev_owner">Previous Owner</label>
+                    <md-input name="prev_owner" id="prev_owner" v-model="form2.prev_owner" :disabled="sending" />
                   </md-field>
                 </div>
                 <div class="md-layout-item md-size-50">
                   <md-field>
-                    <label for="newOWner">New Owner</label>
-                    <md-input name="newOWner" id="danewOWnerte" v-model="form2.newOWner" :disabled="sending" />
+                    <label for="new_owner">New Owner</label>
+                    <md-input name="new_owner" id="new_owner" v-model="form2.new_owner" :disabled="sending" />
                   </md-field>
                 </div>
               </div>
               <div class="md-layout md-gutter">
                 <div class="md-layout-item md-size-50">
                   <md-field>
-                    <label for="agentName">Real Estate Agent's Name</label>
-                    <md-input name="agentName" id="agentName" v-model="form2.agentName" :disabled="sending" />
+                    <label for="real_estate_agent">Real Estate Agent's Name</label>
+                    <md-input name="real_estate_agent" id="real_estate_agent" v-model="form2.real_estate_agent" :disabled="sending" />
                   </md-field>
                 </div>
                 <div class="md-layout-item md-size-50">
                   <md-field>
                     <label for="price">Price</label>
-                    <md-input name="price" id="price" v-model="form2.price" :disabled="sending" />
+                    <span class="md-prefix">$</span>
+                    <md-input type="number" name="price" id="price" v-model="form2.price" :disabled="sending" />
                   </md-field>
                 </div>
               </div>
@@ -118,22 +69,23 @@
               <div class="md-layout md-gutter">
                 <div class="md-layout-item md-size-66">
                   <md-field>
-                    <label for="incident">Type of Incident</label>
+                    <label for="incident">Type of Incident {{ $parent.number }}</label>
                     <md-input name="incident" id="incident" v-model="form3.incident" :disabled="sending" />
                   </md-field>
                 </div>
                 <div class="md-layout-item md-size-33">
                   <md-field>
-                    <label for="damages">Estimated Damages ($)</label>
-                    <md-input name="damages" id="damages" v-model="form3.damages" :disabled="sending" />
+                    <label for="estimated_damages">Estimated Damages ($)</label>
+                    <span class="md-prefix">$</span>
+                    <md-input type="number" name="estimated_damages" id="estimated_damages" v-model="form3.estimated_damages" :disabled="sending" />
                   </md-field>
                 </div>
               </div>
               <div class="md-layout md-gutter">
                 <div class="md-layout-item md-size-50">
                   <md-field>
-                    <label for="agentName">Insurance Agent's Name</label>
-                    <md-input name="agentName" id="agentName" v-model="form3.agentName" :disabled="sending" />
+                    <label for="insurance_agent">Insurance Agent's Name</label>
+                    <md-input name="insurance_agent" id="insurance_agent" v-model="form3.insurance_agent" :disabled="sending" />
                   </md-field>
                 </div>
                 <div class="md-layout-item md-size-50">
@@ -157,14 +109,15 @@
               <div class="md-layout md-gutter">
                 <div class="md-layout-item md-size-66">
                   <md-field>
-                    <label for="inspectorName">Inspector's Name</label>
-                    <md-input name="inspectorName" id="inspectorName" v-model="form4.inspectorName" :disabled="sending" />
+                    <label for="inspector">Inspector's Name</label>
+                    <md-input name="inspector" id="inspector" v-model="form4.inspector" :disabled="sending" />
                   </md-field>
                 </div>
                 <div class="md-layout-item md-size-33">
                   <md-field>
                     <label for="value">House's Value ($)</label>
-                    <md-input name="value" id="value" v-model="form4.value" :disabled="sending" />
+                    <span class="md-prefix">$</span>
+                    <md-input type="number" name="value" id="value" v-model="form4.value" :disabled="sending" />
                   </md-field>
                 </div>
               </div>
@@ -188,8 +141,9 @@
                 </div>
                 <div class="md-layout-item md-size-50">
                   <md-field>
-                    <label for="valueAdded">Value Added to House ($)</label>
-                    <md-input name="valueAdded" id="valueAdded" v-model="form5.valueAdded" :disabled="sending" />
+                    <label for="value_added">Value Added to House ($)</label>
+                    <span class="md-prefix">$</span>
+                    <md-input type="number" name="value_added" id="value_added" v-model="form5.value_added" :disabled="sending" />
                   </md-field>
                 </div>
               </div>
@@ -213,24 +167,26 @@
 
           </md-card-content>
 
-          <md-progress-bar class="md-accent" md-mode="indeterminate" v-if="sending"/>
+          <md-progress-bar class="md-accent md-progress-bar" md-mode="indeterminate" v-if="sending"/>
 
           <md-card-actions>
-            <md-button v-if="showBD" type="submit" class="md-accent md-raised" :disabled="!(form1.addresss && form1.date && form1.builder && form1.lat && form1.lng)"  v-on:click="saveRecord()">Submit</md-button>
-            <md-button v-if="showRE" type="submit" class="md-accent md-raised" :disabled="!(form2.addresss && form2.date && form2.previousOwner && form2.newOWner && form2.agentName && form2.price)"  v-on:click="saveRecord()">Submit</md-button>
-            <md-button v-if="showIA" type="submit" class="md-accent md-raised" :disabled="!(form3.addresss && form3.date && form3.incident && form3.owner && form3.agentName && form3.damages && form3.notes)"  v-on:click="saveRecord()">Submit</md-button>
-            <md-button v-if="showIN" type="submit" class="md-accent md-raised" :disabled="!(form4.addresss && form4.date && form4.inspectorName && form4.value && form4.notes)"  v-on:click="saveRecord()">Submit</md-button>
-            <md-button v-if="showHO" type="submit" class="md-accent md-raised" :disabled="!(form5.addresss && form5.date && form5.owner && form5.improvement && form5.valueAdded && form5.notes)"  v-on:click="saveRecord()">Submit</md-button>
+            <md-button v-if="showRE" type="submit" class="md-accent md-raised" :disabled="!(address && date && form2.prev_owner && form2.new_owner && form2.real_estate_agent && form2.price)"  v-on:click="check()">Submit</md-button>
+            <md-button v-if="showIA" type="submit" class="md-accent md-raised" :disabled="!(address && date && form3.incident && form3.owner && form3.insurance_agent && form3.estimated_damages && form3.notes)"  v-on:click="check()">Submit</md-button>
+            <md-button v-if="showIN" type="submit" class="md-accent md-raised" :disabled="!(address && date && form4.inspector && form4.value && form4.notes)"  v-on:click="check()">Submit</md-button>
+            <md-button v-if="showHO" type="submit" class="md-accent md-raised" :disabled="!(address && date && form5.owner && form5.improvement && form5.value_added && form5.notes)"  v-on:click="check()">Submit</md-button>
           </md-card-actions>
         </md-card>
-
           <md-snackbar :md-active.sync="recordSaved">The transaction was Posted, sign with your wallet now!!!</md-snackbar>
           <md-snackbar :md-active.sync="recordSigned">The transaction was Signed, Congratulations!!!</md-snackbar>
           <md-snackbar :md-active.sync="noWalletLogged">Please click the wallet button on the top right corner to login!!!</md-snackbar>
 
       </div>
     </div>
-
+    <div id="denied" v-if="!loggedIn">
+      <md-icon class="md-size-3x">warning</md-icon>
+      <div class="md-title">You must be logged in to access this page</div>
+      <div><md-button class="md-primary md-raised" to="/">Home</md-button>  <md-button class="md-primary md-raised" to="/account/login">Log In</md-button></div>
+    </div>
   </div>
 </template>
 
@@ -243,121 +199,126 @@ import simbaApi from './gateways/simba-api'
 export default {
   name: 'post',
   mounted () {
-    if (!localStorage.getItem('role')) {
-      this.showWarning = true
-      return
-    }
+    let parent = this.$parent.$parent.$parent.$parent
     this.changePost(localStorage.getItem('role'))
+    this.loggedIn = parent.loggedIn
 
-    let self = this
-
-    setTimeout(function () {
-      var autocomplete
-      autocomplete = new google.maps.places.Autocomplete(document.getElementById('address1'))
-      autocomplete.setFields(['address_component', 'geometry', 'formatted_address'])
-      autocomplete.addListener('place_changed', function () {
-        var place = autocomplete.getPlace()
-        if (!place.geometry) {
-          window.alert("No details available for input: '" + place.name + "'")
-          document.getElementById('address1').value = ''
-          return
-        } else if (place.address_components[0].types[0] != 'street_number') {
-          window.alert("All house address must start with a street number.")
-          document.getElementById('address1').value = ''
-          return
-        } else {
-            self.set(place.formatted_address)
-        }
-      })
-    }, 1)
+    // Get current houses
+    this.getHouses()
   },
   mixins: [localstorage],
 
   data: () => ({
-    scAction: null,
     sending: false,
     recordSaved: false,
     recordSigned: false,
     noWalletLogged: false,
-    accountBalance: null,
     txnId: null,
     unsignedTxn: null,
-    showBD: false,
     showRE: false,
     showIA: false,
     showIN: false,
     showHO: false,
-    showWarning: true,
-
-    form1: {
-      lat: null,
-      lng: null,
-      date: null,
-      assetId: 10,
-      builder: null,
-      addresss: null,
-
-
-    },
+    date: null,
+    houses: [],
+    ids: [],
+    dates: [],
+    address: null,
+    loggedIn: false,
 
     form2: {
       addresss: null,
-      previousOwner: null,
-      newOwner: null,
-      agentName: null,
+      prev_owner: null,
+      new_owner: null,
+      real_estate_agent: null,
       price: null,
-      date: null
+      date: null,
+      assetId: null
     },
 
     form3: {
-      addresss: null,
+      assetId: null,
       incident: null,
       owner: null,
-      agentName: null,
-      damages: null,
+      insurance_agent: null,
+      estimated_damages: null,
       date: null,
       notes: null
     },
 
     form4: {
-      addresss: null,
-      inspectorName: null,
+      assetId: null,
+      inspector: null,
       value: null,
       date: null,
       notes: null
     },
 
     form5: {
-      addresss: null,
+      assetId: null,
       owner: null,
       improvement: null,
-      valueAdded: null,
+      value_added: null,
       date: null,
       notes: null
     }
 
   }),
   methods: {
+    // gets all current houses. Used to populate the autocomplete for all forms except new_house
+    getHouses () {
+      this.houses = []
+      let self = this
+      try {
+        simbaApi.getData('new_house/?')
+          .then(function (response) {
+            let results = response.data.results
+            for (let i = 0; i < results.length; i++) {
+              self.houses.push(results[i].payload.inputs.addresss)
+              self.ids.push(results[i].payload.inputs.assetId)
+              self.dates.push(results[i].payload.inputs.date)
+            }
+          })
+      } catch (e) {
+        console.log(e)
+      }
+    },
+
+    // checks to make sure address entered is a resgistered address. Also checks for an acceptable date.
+    check () {
+      let self = this
+      if (self.houses.includes(this.address)) {
+        var spot = self.houses.indexOf(self.address)
+        if ((new Date(self.date) - new Date(self.dates[spot])) < 0 || (new Date() - new Date(self.date)) < 0) {
+          window.alert(`Date must be after the date the house was built (${self.dates[spot]}) and can't be in the future.`)
+          return
+        } else {
+          if (self.showRE) {
+            self.form2.addresss = self.address
+            self.form2.assetId = self.ids[spot]
+          } else if (self.showIA) {
+            self.form3.assetId = self.ids[spot]
+          } else if (self.showIN) {
+            self.form4.assetId = self.ids[spot]
+          } else if (self.showHO) {
+            self.form5.assetId = self.ids[spot]
+          }
+          self.date = self.date.toString().substring(4,10) + ',' + self.date.toString().substring(10,15)
+          self.saveRecord()
+        }
+      } else {
+        self.address = ''
+        window.alert("Make sure to enter a registered house! Don't see the house you're looking for? Register it now!")
+      }
+
+    },
+
+    // wallet
     getCurrentWallet () {
       this.unlockWallet()
     },
 
-    set (address) {
-      let self = this
-      self.form1.addresss = address
-      var geocoder = new google.maps.Geocoder()
-      geocoder.geocode( { 'address': address}, function(results, status) {
-        if (status == 'OK') {
-          var lat = results[0].geometry.viewport.na
-          var lng = results[0].geometry.viewport.ga
-          self.form1.lat = (lat.j + lat.l) / 2
-          self.form1.lng = (lat.j + lat.l) / 2
-        } else {
-          console.log('Geocode was not successful for the following reason: ' + status);
-        }
-      })
-    },
-
+    // wallet
     unlockWallet () {
       try {
         let mnemonic = this.getWallet()
@@ -366,6 +327,8 @@ export default {
         console.log(e)
       }
     },
+
+    // wallet and signing simba transactions
     sendTxn (mnemonic) {
       let wallet = ethers.Wallet.fromMnemonic(mnemonic)
       let signedTxn = wallet.sign(this.unsignedTxn)
@@ -383,81 +346,64 @@ export default {
         console.log(e)
       }
     },
+
+    // changes user type and what form is displayed on screen
     changePost (post) {
       switch (post) {
-        case 'bd':
-          this.showBD = true
-          this.showRE = false
-          this.showIA = false
-          this.showIN = false
-          this.showHO = false
-          this.showWarning = false
-          break
         case 're':
-          this.showBD = false
           this.showRE = true
           this.showIA = false
           this.showIN = false
           this.showHO = false
-          this.showWarning = false
           break
         case 'ia':
-          this.showBD = false
           this.showRE = false
           this.showIA = true
           this.showIN = false
           this.showHO = false
-          this.showWarning = false
           break
         case 'in':
-          this.showBD = false
           this.showRE = false
           this.showIA = false
           this.showIN = true
           this.showHO = false
-          this.showWarning = false
           break
         case 'ho':
-          this.showBD = false
           this.showRE = false
           this.showIA = false
           this.showIN = false
           this.showHO = true
-          this.showWarning = false
           break
       }
     },
+
+    // clears all form fields
     clearForm () {
-      this.form1.addresss = null
-      this.form1.builder = null
-      this.form1.date = null
-      this.form1.lat = null
-      this.form1.lng = null
       this.form2.addresss = null
-      this.form2.previousOwner = null
-      this.form2.newOWner = null
-      this.form2.agentName = null
+      this.form2.prev_owner = null
+      this.form2.new_owner = null
+      this.form2.real_estate_agent = null
       this.form2.price = null
-      this.form2.date = null
-      this.form3.addresss = null
+      this.form3.assetId = null
       this.form3.incident = null
       this.form3.owner = null
-      this.form3.agentName = null
-      this.form3.damages = null
-      this.form3.date = null
+      this.form3.insurance_agent = null
+      this.form3.estimated_damages = null
       this.form3.notes = null
-      this.form4.addresss = null
-      this.form4.inspectorName = null
+      this.form4.assetId = null
+      this.form4.inspector = null
       this.form4.value = null
-      this.form4.date = null
       this.form4.notes = null
-      this.form5.addresss = null
+      this.form5.assetId = null
       this.form5.owner = null
       this.form5.improvement = null
-      this.form5.valueAdded = null
-      this.form5.date = null
+      this.form5.value_added = null
       this.form5.notes = null
+      this.date = null
+      this.address = null
     },
+
+    // posts all the data to Simba Chain
     saveRecord (e) {
       if (!this.getWallet()) {
         this.noWalletLogged = true
@@ -470,15 +416,9 @@ export default {
 
       let method = null
 
-      if (this.showBD) {
-        method = 'new_house'
-        for (let k in this.form1) {
-          if (this.form1.hasOwnProperty(k)) {
-            bodyFormData.append(k, this.form1[k])
-          }
-        }
-      } else if (this.showRE) {
-        method = 'houseSale'
+      if (this.showRE) {
+        method = 'house_sale'
+        this.form2.date = this.date
         for (let k in this.form2) {
           if (this.form2.hasOwnProperty(k)) {
             bodyFormData.append(k, this.form2[k])
@@ -486,6 +426,7 @@ export default {
         }
       } else if (this.showIA) {
         method = 'accident'
+        this.form3.date = this.date
         for (let k in this.form3) {
           if (this.form3.hasOwnProperty(k)) {
             bodyFormData.append(k, this.form3[k])
@@ -493,6 +434,7 @@ export default {
         }
       } else if (this.showIN) {
         method = 'appraisal'
+        this.form4.date = this.date
         for (let k in this.form4) {
           if (this.form4.hasOwnProperty(k)) {
             bodyFormData.append(k, this.form4[k])
@@ -500,6 +442,7 @@ export default {
         }
       } else {
         method = 'improvement'
+        this.form5.date = this.date
         for (let k in this.form5) {
           if (this.form5.hasOwnProperty(k)) {
             bodyFormData.append(k, this.form5[k])
@@ -507,7 +450,6 @@ export default {
         }
       }
 
-      console.log(bodyFormData)
       let self = this
       try {
         simbaApi.postData(method + '/', bodyFormData).then(function (res) {
@@ -529,13 +471,6 @@ export default {
 </script>
 
 <style scoped>
-  .my-card {
-    margin-top: 40px;
-    width: 300px;
-    display: inline-block;
-    vertical-align: top;
-    margin-bottom: 20px;
-  }
   .md-progress-bar {
     position: absolute;
     top: 0;
@@ -554,13 +489,7 @@ export default {
   .post-card {
     margin: 10px;
   }
-  .options {
-    margin-top: 40px;
-  }
-  .wallet {
-    min-width: 320px;
-  }
-  .wallet-content {
-    margin: 20px;
+  #denied {
+    text-align: center;
   }
 </style>

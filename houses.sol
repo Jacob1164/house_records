@@ -3,9 +3,11 @@ pragma solidity ^0.4.24;
 contract Application {
     function Application() public {}
     enum Assets {
-        House
+        House,
+        User
     }
     Assets _new_house = Assets.House;
+    Assets _create_user = Assets.User;
     Assets _improvement = Assets.House;
     Assets _house_sale = Assets.House;
     Assets _appraisal = Assets.House;
@@ -16,8 +18,20 @@ contract Application {
         string addresss,
         string date,
         string builder,
-        string lat,
-        string lng)
+        int256 lat,
+        int256 lng,
+        int256 lat_neg,
+        int256 lng_neg)
+    public {}
+
+    function create_user (
+        string assetId,
+        string username,
+        string password,
+        string first,
+        string last,
+        string role,
+        string email)
     public {}
 
     function improvement (

@@ -2,7 +2,10 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/components/Home'
 import Post from '@/components/Post'
-import Get from '@/components/Get'
+import Records from '@/components/Records'
+import Register from '@/components/Register'
+import Login from '@/components/Login'
+import Signup from '@/components/Signup'
 
 Vue.use(Router)
 
@@ -20,9 +23,24 @@ export default new Router({
       component: Post
     },
     {
-      path: '/get',
-      name: 'Get',
-      component: Get
+      path: '/records/:houseId',
+      name: 'Records',
+      component: Records
+    },
+    {
+      path: '/register',
+      name: 'Register',
+      component: Register
+    },
+    {
+      path: '/account/login',
+      name: 'Login',
+      component: Login
+    },
+    {
+      path: '/account/signup',
+      name: 'Signup',
+      component: Signup
     }
   ]
 })
