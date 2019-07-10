@@ -77,6 +77,10 @@ export default {
             } else {
               localStorage.setItem('loggedIn', true)
               parent.loggedIn = true
+              parent.accountInfo.first = results[0].payload.inputs.first
+              parent.accountInfo.last = results[0].payload.inputs.last
+              parent.accountInfo.email = results[0].payload.inputs.email
+              parent.accountInfo.role = results[0].payload.inputs.role
               localStorage.setItem('role', results[0].payload.inputs.role)
               localStorage.setItem('assetId', results[0].payload.inputs.assetId)
               self.$router.push('/post')

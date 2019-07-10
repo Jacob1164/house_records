@@ -119,22 +119,19 @@ export default {
           self.form1.assetId = results[0].place_id
           var lat = results[0].geometry.viewport.na
           var lng = results[0].geometry.viewport.ga
+
           var send_lat = Math.round(((lat.j + lat.l) / 2) * 10000000)
           var send_lng = Math.round(((lng.j + lng.l) / 2) * 10000000)
 
           // for some reason, Simba does not accept negative integers
           // the following sets a separate boolean to true if the value is negative
-          // (and then makes it positive so Simba will accept it)
-          if (send_lat >= 0) {
-            self.form1.lat = send_lat
-          } else {
-            self.form1.lat = send_lat * -1
+          // (and makes it positive so Simba will accept it)
+          self.form1.lat = Math.abs(send_lat)
+          self.form1.lng = Math.abs(send_lng)
+          if (send_lat < 0) {
             self.form1.lat_neg = 1
           }
-          if (send_lng >= 0) {
-            self.form1.lng = send_lng
-          } else {
-            self.form1.lng = send_lng * -1
+          if (send_lng < 0) {
             self.form1.lng_neg = 1
           }
         } else {

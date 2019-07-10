@@ -2,11 +2,13 @@
   <div class="md-layout md-gutter">
     <md-card class="md-layout-item md-size-100">
       <div>
-        <md-field>
-          <label for="search">Enter a location. Don't see the house you're looking for? Register it now!</label>
-          <md-input name="search" id="search" v-model="search" placeholder=""/>
-        </md-field>
-        <div id="map" style="height:76vh; width:100%;"></div>
+        <md-toolbar floating dense style="background-color: grey;">
+          <md-field>
+            <label for="search">Enter a location. Don't see the house you're looking for? Register it now!</label>
+            <md-input name="search" id="search" v-model="search" placeholder=""/>
+          </md-field>
+        </md-toolbar>
+        <div id="map" style="height:78vh; width:100%;"></div>
       </div>
     </md-card>
   </div>
@@ -83,17 +85,25 @@ export default {
       // constructs the GET url for simba
       var url = 'new_house/?'
       if (lat_min < 0 && lat_max < 0) {
-        lat_min *= -1
-        lat_max *= -1
-        url += ('lat_lte=' + lat_min + '&lat_gte=' +lat_max + '&lat_neg_equals=1')
+        url += ('lat_lte=' + Math.abs(lat_min) + '&lat_gte=' + Math.abs(lat_max) + '&lat_neg_equals=1')
+      } else if (!(lat_min < 0 && lat_max < 0) && (lat_min < 0 || lat_max < 0)) {
+        if (lat_min > lat_max) {
+          url += ('lat_lte=' + Math.abs(lat_min))
+        } else {
+          url += ('lat_lte=' + Math.abs(lat_max))
+        }
       } else {
         url += ('lat_gte=' + lat_min + '&lat_lte=' +lat_max + '&lat_neg_equals=0')
       }
 
       if (lng_min < 0 && lng_max < 0) {
-        lng_min *= -1
-        lng_max *= -1
-        url += ('&lng_lte=' + lng_min + '&lng_gte=' +lng_max + '&lng_neg_equals=1')
+        url += ('&lng_lte=' + Math.abs(lng_min) + '&lng_gte=' + Math.abs(lng_max) + '&lng_neg_equals=1')
+      } else if (!(lng_min < 0 && lng_max < 0) && (lng_min < 0 || lng_max < 0)) { // if one is positive and one is negative
+        if (lng_min > lng_max) {
+          url += ('&lng_lte=' + Math.abs(lng_min))
+        } else {
+          url += ('&lng_lte=' + Math.abs(lat_max))
+        }
       } else {
         url += ('&lng_gte=' + lng_min + '&lng_lte=' +lng_max + '&lng_neg_equals=0')
       }
@@ -134,7 +144,7 @@ export default {
           })
           self.markers.push(marker)
           var contentString = '<div class="i_content" style="color: black;"><div class="md-subheading">' + self.searched[i].payload.inputs.addresss + '</div><br>'
-           + '<div class="md-body-1">Date Built: ' + self.searched[i].payload.inputs.date + '</div><br>' + '<a href="/#/records/' + self.searched[i].payload.inputs.assetId + '">Get full house records</a>' + '</div>'
+           + '<div class="md-body-1">Date Built: ' + self.searched[i].payload.inputs.date + '</div><br>' + '<a href="/#/records/' + self.searched[i].payload.inputs.assetId + '"><u style="color: blue;">Get full house records</u></a>' + '</div>'
 
           let infoWindow = new google.maps.InfoWindow({
             content: contentString

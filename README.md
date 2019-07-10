@@ -30,8 +30,8 @@ npm run dev
 * There is a sign up and a log in page.
 * Once logged in as a specific role (Real estate agent, insurance agent, inspector, or home owner) the user can add the make their corresponding transaction to any registered house.
 * Additional features include:
-...* Google Maps Autocomplete on the home and register pages
-...* Google Maps Static in both map and street view on each house's page
-...* Not allowing the user to select a date in the future, or a date before the house was built for any non-registering transactions
-...* General protection against form misuse
-...* And of course: all files stored on SIMBA's Circle-of-Life Ethereum blockchain, ensuring security and reliability
+..* Google Maps Autocomplete on the home and register pages
+..* Google Maps Static in both map and street view on each house's page
+..* Not allowing the user to select a date in the future, or a date before the house was built for any non-registering transactions
+..* General protection against form misuse
+..* And of course: all files stored on SIMBA's Circle-of-Life Ethereum blockchain, ensuring security and reliability

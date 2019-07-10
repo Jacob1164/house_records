@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="md-display-1 move" v-if="records[0]"><span style="color: white;">House Records:</span> {{ records[0].payload.inputs.addresss }} </div><br>
+    <div class="md-layout-item md-display-1 move md-size-80" v-if="records[0]"><span style="color: white;">House Records:</span> {{ records[0].payload.inputs.addresss }} </div><br>
     <div class="md-layout-item" v-if="records[0]">
       <div class="md-layout md-gutter">
         <div class="md-layout-item md-size-66">
@@ -53,6 +53,8 @@
           </div>
         </div>
         <div class="md-layout-item md-size-33">
+          <div class="md-body-2" v-if="!claimed">This house is not currently claimed. Login as a home owner to claim this house if you own it.</div>
+          <div class="md-body-2" v-if="claimed">This house has been claimed by its owner.</div><br>
           <div><img :src="img_url"/></div><br>
           <div><img :src="street_url"/></div>
         </div>
@@ -88,13 +90,14 @@ export default {
       showInfoDialog: false,
       infoData: null,
       img_url: '',
-      street_url: ''
+      street_url: '',
+      claimed: 0
     }
   },
 
   mounted () {
     this.houseId = this.$route.params.houseId
-    let url = 'transaction/?assetId_exact=' + this.houseId
+    let url = 'transaction/?assetId_exact=' + this.houseId + '&method!=claim'
     let self = this
     try {
       simbaApi.getData(url)
@@ -107,6 +110,18 @@ export default {
           })
           self.records = self.records.reverse()
           self.done()
+        })
+    } catch (e) {
+      console.log(e)
+    }
+
+    let url2 = 'transaction/?method=claim&house_assetId_exact=' + this.houseId
+    try {
+      simbaApi.getData(url2)
+        .then(function (response) {
+          if (response.data.results.length != 0) {
+            self.claimed = response.data.results[0].payload.inputs.active
+          }
         })
     } catch (e) {
       console.log(e)

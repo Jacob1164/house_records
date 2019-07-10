@@ -21,12 +21,12 @@
               <strong style="color:#64dd17;">File An Inspection</strong>
             </div>
             <div v-if="showHO" class="md-layout-item md-size-100">
-              <strong style="color:#64dd17;">Report A Home Improvement</strong>
+              <strong style="color:#64dd17;">Log A Home Improvement</strong>
             </div>
-              <div class="md-body-2"><br>Don't see the address you're looking for? Make sure to register the home first!</div>
+              <div class="md-body-2" v-if="!showHO"><br>Don't see the address you're looking for? Make sure to register the home first!</div>
             <div class="md-layout md-gutter">
               <div class="md-layout-item md-size-80">
-                <md-autocomplete name="address" id="address" v-model="address" :disabled="sending" :md-options="houses" md-dense><label>Search for a registered address</label></md-autocomplete>
+                <md-autocomplete name="address" id="address" v-model="address" :disabled="sending || claimedHouse" :md-options="houses" md-dense><label v-if="!showHO">Search for a registered address</label><label v-if="showHO">Address</label></md-autocomplete>
               </div>
               <div class="md-layout-item md-size-20">
                 <md-datepicker name="date" id="date" v-model="date" :disabled="sending" md-immediately/>
@@ -132,36 +132,41 @@
             </div>
 
             <div v-if="showHO">
-              <div class="md-layout md-gutter">
-                <div class="md-layout-item md-size-50">
-                  <md-field>
-                    <label for="owner">Owner</label>
-                    <md-input name="owner" id="owner" v-model="form5.owner" :disabled="sending" />
-                  </md-field>
+              <div v-if="claimedHouse == true">
+                <div class="md-layout md-gutter">
+                  <div class="md-layout-item md-size-50">
+                    <md-field>
+                      <label for="owner">Owner</label>
+                      <md-input name="owner" id="owner" v-model="form5.owner" disabled/>
+                    </md-field>
+                  </div>
+                  <div class="md-layout-item md-size-50">
+                    <md-field>
+                      <label for="value_added">Value Added to House ($)</label>
+                      <span class="md-prefix">$</span>
+                      <md-input type="number" name="value_added" id="value_added" v-model="form5.value_added" :disabled="sending" />
+                    </md-field>
+                  </div>
                 </div>
-                <div class="md-layout-item md-size-50">
-                  <md-field>
-                    <label for="value_added">Value Added to House ($)</label>
-                    <span class="md-prefix">$</span>
-                    <md-input type="number" name="value_added" id="value_added" v-model="form5.value_added" :disabled="sending" />
-                  </md-field>
+                <div class="md-layout md-gutter">
+                  <div class="md-layout-item md-size-100">
+                    <md-field>
+                      <label for="improvement">Improvement made</label>
+                      <md-input name="improvement" id="improvement" v-model="form5.improvement" :disabled="sending" />
+                    </md-field>
+                  </div>
+                </div>
+                <div class="md-layout md-gutter">
+                  <div class="md-layout-item md-size-100">
+                    <md-field>
+                      <label for="notes">Notes</label>
+                      <md-textarea class="md-textarea" name="notes" id="notes" v-model="form5.notes" :disabled="sending"></md-textarea>
+                    </md-field>
+                  </div>
                 </div>
               </div>
-              <div class="md-layout md-gutter">
-                <div class="md-layout-item md-size-100">
-                  <md-field>
-                    <label for="improvement">Improvement made</label>
-                    <md-input name="improvement" id="improvement" v-model="form5.improvement" :disabled="sending" />
-                  </md-field>
-                </div>
-              </div>
-              <div class="md-layout md-gutter">
-                <div class="md-layout-item md-size-100">
-                  <md-field>
-                    <label for="notes">Notes</label>
-                    <md-textarea class="md-textarea" name="notes" id="notes" v-model="form5.notes" :disabled="sending"></md-textarea>
-                  </md-field>
-                </div>
+              <div v-if="claimedHouse == false">
+                <div class="md-body-2 md-accent">You must claim a house as yours before you can log any home improvements. Click on the 'Claim Your House' tab now!</div>
               </div>
             </div>
 
@@ -205,6 +210,11 @@ export default {
 
     // Get current houses
     this.getHouses()
+
+    if (this.showHO) {
+      this.form5.owner = parent.accountInfo.first + ' ' + parent.accountInfo.last
+      this.getClaimedHouse()
+    }
   },
   mixins: [localstorage],
 
@@ -225,6 +235,7 @@ export default {
     dates: [],
     address: null,
     loggedIn: false,
+    claimedHouse: null,
 
     form2: {
       addresss: null,
@@ -313,6 +324,26 @@ export default {
 
     },
 
+    getClaimedHouse () {
+      let self = this
+      let url = 'claim/?assetId_exact=' + localStorage.getItem('assetId')
+      try {
+        simbaApi.getData(url)
+          .then(function (response) {
+            let results = response.data.results[0]
+            if (results.payload.inputs.active) {
+              self.form5.assetId = response.data.results[0].payload.inputs.house_assetId
+              self.address = response.data.results[0].payload.inputs.addresss
+              self.claimedHouse = true
+            } else {
+              self.claimedHouse = false
+            }
+          })
+      } catch (e) {
+        console.log(e)
+      }
+    },
+
     // wallet
     getCurrentWallet () {
       this.unlockWallet()
@@ -395,12 +426,13 @@ export default {
       this.form4.value = null
       this.form4.notes = null
       this.form5.assetId = null
-      this.form5.owner = null
       this.form5.improvement = null
       this.form5.value_added = null
       this.form5.notes = null
       this.date = null
-      this.address = null
+      if (!this.showHO) {
+        this.address = null
+      }
     },
 
     // posts all the data to Simba Chain

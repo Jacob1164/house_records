@@ -7,10 +7,11 @@
             <md-button class="md-icon-button" @click="menuVisible = !menuVisible">
               <md-icon>menu</md-icon>
             </md-button>
-            <h3 class="md-title">House Demo</h3>
+            <h3 class="md-title">House Dem</h3>
             <md-button to="/">Home</md-button>
             <md-button to="/register">Register a House</md-button>
             <md-button v-if="loggedIn" to="/post">Add Records</md-button>
+            <md-button v-if="loggedIn && accountInfo.role == 'ho'" to="/claim">Claim Your House</md-button>
           </div>
 
           <div class="md-toolbar-section-end">
@@ -67,7 +68,7 @@
             <div class="space">
               <div class="md-title">{{accountInfo.first}} {{accountInfo.last}}</div>
               <div class="md-body-1"><strong>Email: </strong>{{accountInfo.email}}</div>
-              <div class="md-body-1"><strong>Role: </strong>{{accountInfo.role}}</div>
+              <div class="md-body-1"><strong>Role: </strong>{{accountInfo.displayRole}}</div>
             </div>
           </md-dialog>
 
@@ -253,7 +254,8 @@ export default {
         first: null,
         last: null,
         email: null,
-        role: null
+        role: null,
+        displayRole: null
       },
       loggedIn: false
     }
@@ -266,28 +268,15 @@ export default {
     setAccount (status) {
       this.account = status
       if (status === true) {
-        let self = this
-        let url = 'create_user/?assetId_exact=' + localStorage.getItem('assetId')
-        try {
-          simbaApi.getData(url)
-            .then(function (response) {
-              let results = response.data.results
-              self.accountInfo.first = results[0].payload.inputs.first
-              self.accountInfo.last = results[0].payload.inputs.last
-              self.accountInfo.email = results[0].payload.inputs.email
-              let role = results[0].payload.inputs.role
-              if (role == 'ia') {
-                self.accountInfo.role = 'Insurance Agent'
-              } else if (role == 'in') {
-                self.accountInfo.role = 'Inspector'
-              } else if (role == 're') {
-                self.accountInfo.role = 'Real Estate Agent'
-              } else {
-                self.accountInfo.role = 'Home Owner'
-              }
-            })
-        } catch (e) {
-          console.log(e)
+        let role = this.accountInfo.role
+        if (role == 'ia') {
+          this.accountInfo.displayRole = 'Insurance Agent'
+        } else if (role == 'in') {
+          this.accountInfo.displayRole = 'Inspector'
+        } else if (role == 're') {
+          this.accountInfo.displayRole = 'Real Estate Agent'
+        } else {
+          this.accountInfo.displayRole = 'Home Owner'
         }
       }
     },
@@ -414,8 +403,13 @@ export default {
     },
     logout () {
       this.loggedIn = false
+      this.accountInfo.first = null
+      this.accountInfo.last = null
+      this.accountInfo.email = null
+      this.accountInfo.role = null
+      localStorage.setItem('assetId', null)
       localStorage.setItem('loggedIn', false)
-      localStorage.setItem('role', '')
+      localStorage.setItem('role', null)
       this.$router.push('/')
     }
   },
