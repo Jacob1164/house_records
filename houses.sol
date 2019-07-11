@@ -4,7 +4,8 @@ contract Application {
     function Application() public {}
     enum Assets {
         House,
-        User
+        User,
+        Claim
     }
     Assets _new_house = Assets.House;
     Assets _create_user = Assets.User;
@@ -12,6 +13,7 @@ contract Application {
     Assets _house_sale = Assets.House;
     Assets _appraisal = Assets.House;
     Assets _accident = Assets.House;
+    Assets _claim = Assets.Claim;
 
     function new_house (
         string assetId,
@@ -68,5 +70,12 @@ contract Application {
         string date,
         string insurance_agent,
         int256 estimated_damages)
+    public {}
+
+    function claim (
+        string assetId,
+        string addresss,
+        string house_assetId
+        int256 active)
     public {}
 }

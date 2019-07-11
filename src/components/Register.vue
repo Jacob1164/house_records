@@ -193,8 +193,8 @@ export default {
       this.form1.builder = null
       this.form1.lat = null
       this.form1.lng = null
-      this.form1.lat_neg = null
-      this.form1.lng_neg = null
+      this.form1.lat_neg = 0
+      this.form1.lng_neg = 0
       this.date = null
     },
 

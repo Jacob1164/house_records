@@ -7,7 +7,7 @@
             <md-button class="md-icon-button" @click="menuVisible = !menuVisible">
               <md-icon>menu</md-icon>
             </md-button>
-            <h3 class="md-title">House Dem</h3>
+            <h3 class="md-title">House Demo</h3>
             <md-button to="/">Home</md-button>
             <md-button to="/register">Register a House</md-button>
             <md-button v-if="loggedIn" to="/post">Add Records</md-button>
