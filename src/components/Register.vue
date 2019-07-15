@@ -1,51 +1,34 @@
 <template>
   <div>
-    <div class="post-form">
-      <md-card class="md-layout-item md-size-90 md-large-size-80 md-medium-size-100 md-small-size-100 md-xsmall-size-100">
-        <md-card-header>
-          <div class="title">Register a Home</div>
-        </md-card-header>
-
-        <md-card-content class="post-card">
-          <div class="md-layout-item md-size-100">
-            <strong style="color:#64dd17;" id="setTest">Make sure to enter a valid address</strong>
+    <div>
+      <b-card bg-variant="light" class="col-xl-9 col-lg-10 col-md-11 col-sm-12 col-12 post-card" title="Register a Home" sub-title="Make sure to enter a valid address">
+        <div class="row">
+          <div class="col-9">
+            <b-form-group description="Address">
+              <b-form-input name="address" id="address1" v-model="form1.addresss" :disabled="sending" placeholder=""/>
+            </b-form-group>
           </div>
-          <div class="md-layout md-gutter">
-            <div class="md-layout-item md-size-80">
-              <md-field>
-                <label for="address">Address</label>
-                <md-input name="address" id="address1" v-model="form1.addresss" :disabled="sending" placeholder=""/>
-              </md-field>
-            </div>
-            <div class="md-layout-item md-size-20">
-              <md-datepicker name="date" id="date" v-model="date" :disabled="sending" md-immediately/>
-            </div>
+          <div class="col-3">
+            <b-form-group description="Date">
+              <b-form-input type="date" name="date" id="date" v-model="date" :disabled="sending"/>
+            </b-form-group>
           </div>
+        </div>
 
-          <div>
-            <div class="md-layout md-gutter">
-              <div class="md-layout-item md-size-100">
-                <md-field>
-                  <label for="builder">Builder's Name</label>
-                  <md-input name="builder" id="builder" v-model="form1.builder" :disabled="sending" />
-                </md-field>
-              </div>
-            </div>
+        <div class="row">
+          <div class="col-12">
+            <b-form-group description="Builder's Name">
+              <b-form-input name="builder" id="builder" v-model="form1.builder" :disabled="sending" />
+            </b-form-group>
           </div>
+        </div>
 
-        </md-card-content>
-
-        <md-progress-bar class="md-accent" md-mode="indeterminate" v-if="sending"/>
-
-        <md-card-actions>
-          <md-button type="submit" class="md-accent md-raised" :disabled="!(form1.addresss && date && form1.builder && form1.lat && form1.lng)"  v-on:click="saveRecord()">Submit</md-button>
-        </md-card-actions>
-      </md-card>
-
-        <md-snackbar :md-active.sync="recordSaved">The transaction was Posted, sign with your wallet now!!!</md-snackbar>
-        <md-snackbar :md-active.sync="recordSigned">The transaction was Signed, Congratulations!!!</md-snackbar>
-        <md-snackbar :md-active.sync="noWalletLogged">Please click the wallet button on the top right corner to login!!!</md-snackbar>
-
+        <div class="row">
+          <b-button type="submit" variant="success" v-if="(form1.addresss && date && form1.builder && form1.lat && form1.lng)"  v-on:click="saveRecord()">Submit</b-button>
+          <b-button type="submit" variant="outline-success" v-if="!(form1.addresss && date && form1.builder && form1.lat && form1.lng)" disabled>Submit</b-button>
+          &nbsp; &nbsp; <b-spinner variant="primary" v-if="sending" label="Loading..."></b-spinner>
+        </div>
+      </b-card>
     </div>
   </div>
 </template>
@@ -86,15 +69,9 @@ export default {
   mixins: [localstorage],
 
   data: () => ({
-    scAction: null,
     sending: false,
-    recordSaved: false,
-    recordSigned: false,
-    noWalletLogged: false,
-    accountBalance: null,
     txnId: null,
     unsignedTxn: null,
-    showWarning: true,
     date: null,
     duplicate: null,
     form1: {
@@ -179,7 +156,7 @@ export default {
       }
       try {
         simbaApi.signTxn('transaction/' + txnId + '/', payload).then(function () {
-          self.recordSigned = true
+          self.$parent.makeToast('The transaction was signed, congratulations!!!', 'success', 'Register')
           self.isSigning = false
         })
       } catch (e) {
@@ -201,7 +178,7 @@ export default {
     // posts all the data to Simba Chain
     saveRecord (e) {
       if (!this.getWallet()) {
-        this.noWalletLogged = true
+        this.$parent.makeToast('Please click the wallet button on the top right corner to login!!!', 'danger', 'Ethereum Wallet')
         return
       }
       if (this.duplicate) {
@@ -215,9 +192,10 @@ export default {
 
       if ((new Date() - new Date(this.date)) < 0) {
         window.alert('Date can not be in the future')
-        this.form1.date = null
         this.date = null
         return
+      } else {
+        this.date = new Date(this.date)
       }
 
       this.sending = true
@@ -238,7 +216,7 @@ export default {
           self.txnId = res.data.id
           self.unsignedTxn = res.data.payload.raw
           self.getCurrentWallet()
-          self.recordSaved = true
+          self.$parent.makeToast('The transaction was posted!!!', 'success', 'Register')
           self.sending = false
           self.clearForm()
         })

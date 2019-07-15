@@ -1,16 +1,12 @@
 <template>
-  <div class="md-layout md-gutter">
-    <md-card class="md-layout-item md-size-100">
+  <div id="div_map">
+    <b-card>
       <div>
-        <md-toolbar floating dense style="background-color: grey;">
-          <md-field>
-            <label for="search">Enter a location. Don't see the house you're looking for? Register it now!</label>
-            <md-input name="search" id="search" v-model="search" placeholder=""/>
-          </md-field>
-        </md-toolbar>
-        <div id="map" style="height:78vh; width:100%;"></div>
+        <small class="text-muted">Enter a location. Don't see the house you're looking for? Register it now!</small>
+        <b-form-input size="sm" name="search" id="search" v-model="search" placeholder="Enter a location. Don't see the house you're looking for? Register it now!"/>
+        <div id="map" style="height:79vh; width:100%;"></div>
       </div>
-    </md-card>
+    </b-card>
   </div>
 </template>
 
@@ -143,8 +139,8 @@ export default {
             position: {lat: lat, lng: lng}
           })
           self.markers.push(marker)
-          var contentString = '<div class="i_content" style="color: black;"><div class="md-subheading">' + self.searched[i].payload.inputs.addresss + '</div><br>'
-           + '<div class="md-body-1">Date Built: ' + self.searched[i].payload.inputs.date + '</div><br>' + '<a href="/#/records/' + self.searched[i].payload.inputs.assetId + '"><u style="color: blue;">Get full house records</u></a>' + '</div>'
+          var contentString = '<div class="i_content" style="color: black;"><h6>' + self.searched[i].payload.inputs.addresss + '</h6>'
+           + '<p>Date Built: ' + self.searched[i].payload.inputs.date + '</p><br>' + '<a href="/#/records/' + self.searched[i].payload.inputs.assetId + '"><u style="color: blue;">Get full house records</u></a>' + '</div>'
 
           let infoWindow = new google.maps.InfoWindow({
             content: contentString
@@ -174,4 +170,7 @@ export default {
 </script>
 
 <style lang="css" scoped>
+#search {
+  margin-bottom: 5px;
+}
 </style>

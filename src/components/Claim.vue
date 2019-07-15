@@ -1,55 +1,41 @@
 <template>
   <div>
-    <div v-if="loggedIn && role == 'ho'" class="post-form">
-      <md-card class="md-layout-item md-size-90 md-large-size-80 md-medium-size-100 md-small-size-100 md-xsmall-size-100" v-if="currentClaim == 0">
-        <md-card-header>
-          <div class="title">Claim Your House</div>
-        </md-card-header>
-
-        <md-card-content class="post-card">
-          <div class="md-layout-item md-size-100">
-            <strong style="color:#64dd17;">Make sure to enter a valid address</strong>
+    <div v-if="loggedIn && role == 'ho'">
+      <b-card class="col-xl-9 col-lg-10 col-md-11 col-sm-12 col-12 post-card" title="Claim Your House" v-if="currentClaim == 0" bg-variant="light">
+        <h5>Make sure to enter a valid address</h5>
+        <h6><br>Don't see the address you're looking for? Make sure to register the home first!</h6>
+        <div class="row">
+          <div class="col-12">
+            <b-form-group description="Address">
+              <b-form-input name="address" id="address" v-model="claim.addresss" :disabled="sending" placeholder="Address" v-on:keyup="toggleVisible()"/>
+              <div class="options" v-if="visible">
+                <ul>
+                  <li v-for="(match, index) in matches" :key="index" v-text="match" @click="itemClicked(index)"></li>
+                </ul>
+              </div>
+            </b-form-group>
           </div>
-          <div class="md-body-2"><br>Don't see the address you're looking for? Make sure to register the home first!</div>
-          <div class="md-layout md-gutter">
-            <div class="md-layout-item md-size-100">
-              <md-autocomplete name="address" id="address" v-model="address" :disabled="sending" :md-options="houses" md-dense><label>Search for a registered address</label></md-autocomplete>
-            </div>
-          </div>
-        </md-card-content>
+        </div>
 
-        <md-progress-bar class="md-accent md-progress-bar" md-mode="indeterminate" v-if="sending"/>
+        <b-button type="submit" v-if="!(claim.addresss)" variant="outline-success" disabled>Submit</b-button>
+        <b-button type="submit" v-if="claim.addresss" variant="success" v-on:click="check()">Submit</b-button>
+        &nbsp; &nbsp; <b-spinner variant="primary" v-if="sending" label="Loading..."></b-spinner>
+      </b-card>
 
-        <md-card-actions>
-          <md-button type="submit" class="md-accent md-raised" :disabled="!(address)"  v-on:click="check()">Submit</md-button>
-        </md-card-actions>
-      </md-card>
+      <b-card v-if='currentClaim' class="post-card" bg-variant="light" title="'Un-claim' Your House" style="text-align: center;">
+        <p>{{ unclaim.addresss }}
+        <h5>No longer own this house?</h5>
+        <h6><br>Unclaim it now so you can claim your new house!</h6>
 
-      <md-card v-if='currentClaim' style="text-align: center;">
-        <md-card-header>
-          <div class="title">"Un-claim" Your House: <strong>{{ unclaim.addresss }}</strong></div>
-        </md-card-header>
-
-        <md-card-content class="post-card">
-          <div class="md-layout-item md-size-100">
-            <strong style="color:#64dd17;">No longer own this house?</strong>
-          </div>
-          <div class="md-body-2"><br>Unclaim it now so you can claim your new house!</div>
-        </md-card-content>
-
-        <md-button type="submit" class="md-accent md-raised" v-on:click="saveRecord()">Un-Claim</md-button>
-        <md-progress-bar class="md-accent md-progress-bar" md-mode="indeterminate" v-if="sending"/>
-      </md-card>
-
-      <md-snackbar :md-active.sync="recordSaved">The transaction was Posted, sign with your wallet now!!!</md-snackbar>
-      <md-snackbar :md-active.sync="recordSigned">The transaction was Signed, Congratulations!!!</md-snackbar>
-      <md-snackbar :md-active.sync="noWalletLogged">Please click the wallet button on the top right corner to login!!!</md-snackbar>
+        <b-button type="submit" variant="success" v-on:click="saveRecord()">Un-Claim</b-button>
+        &nbsp; &nbsp; <b-spinner variant="primary" v-if="sending" label="Loading..."></b-spinner>
+      </b-card>
     </div>
 
     <div id="denied" v-if="!loggedIn || !(role == 'ho')">
-      <md-icon class="md-size-3x">warning</md-icon>
-      <div class="md-title">You must be logged in as a home owner to access this page</div>
-      <div><md-button class="md-primary md-raised" to="/">Home</md-button>  <md-button class="md-primary md-raised" to="/account/login">Log In</md-button></div>
+      <img style="height: 70px;" src="./icons/warning.svg" alt="warning">
+      <h4>You must be logged in as a home owner to access this page</h4>
+      <div class="text-center"><b-button variant="dark" to="/">Home</b-button> &nbsp; &nbsp; <b-button variant="dark" to="/account/login">Log In</b-button></div>
     </div>
   </div>
 </template>
@@ -61,50 +47,61 @@ import ethers from 'ethers'
 import simbaApi from './gateways/simba-api'
 
 export default {
-  name: 'post',
   mounted () {
-    let parent = this.$parent.$parent.$parent.$parent
     this.claim.assetId = localStorage.getItem('assetId')
     this.unclaim.assetId = localStorage.getItem('assetId')
-    this.loggedIn = parent.loggedIn
-    this.role = parent.accountInfo.role
+    this.loggedIn = this.$parent.loggedIn
+    this.role = this.$parent.accountInfo.role
 
     // Get current houses
     this.getHouses()
     this.checkClaims()
   },
+
   mixins: [localstorage],
 
-  data: () => ({
-    sending: false,
-    recordSaved: false,
-    recordSigned: false,
-    noWalletLogged: false,
-    txnId: null,
-    unsignedTxn: null,
-    houses: [],
-    ids: [],
-    address: null,
-    loggedIn: false,
-    currentClaim: null,
-    role: null,
+  data () {
+    return {
+      sending: false,
+      txnId: null,
+      unsignedTxn: null,
+      houses: [],
+      ids: [],
+      address: null,
+      loggedIn: false,
+      currentClaim: null,
+      role: null,
+      visible: true,
 
-    claim: {
-      assetId: null,
-      addresss: null,
-      house_assetId: null,
-      active: 1
+      claim: {
+        assetId: null,
+        addresss: '',
+        house_assetId: null,
+        active: 1
+      },
+
+      unclaim: {
+        assetId: null,
+        addresss: null,
+        house_assetId: null,
+        active: 0
+
+      }
+    }
+  },
+  methods: {
+    // the following two methods are used for the autocomplete address search bar
+    // thanks to AfikDeri for help with the autocomplete
+    // https://github.com/AfikDeri/VueJS-Autocomplete
+    toggleVisible () {
+      this.visible = true
     },
 
-    unclaim: {
-      assetId: null,
-      addresss: null,
-      house_assetId: null,
-      active: 0
+    itemClicked (index) {
+      this.claim.addresss = this.matches[index]
+      this.visible = !this.visible
+    },
 
-    }
-  }),
-  methods: {
     // gets all current houses. Used to populate the autocomplete for all forms except new_house
     getHouses () {
       this.houses = []
@@ -129,11 +126,15 @@ export default {
       try {
         simbaApi.getData(url)
           .then(function (response) {
-            let result = response.data.results[0].payload.inputs
-            if (result.active == 1) {
-              self.currentClaim = 1
-              self.unclaim.addresss = result.addresss
-              self.unclaim.house_assetId = result.house_assetId
+            if (response.data.count != 0) {
+              let result = response.data.results[0].payload.inputs
+              if (result.active == 1) {
+                self.currentClaim = 1
+                self.unclaim.addresss = result.addresss
+                self.unclaim.house_assetId = result.house_assetId
+              } else {
+                self.currentClaim = 0
+              }
             } else {
               self.currentClaim = 0
             }
@@ -146,13 +147,12 @@ export default {
     // checks to make sure address entered is a resgistered address. Also checks for an acceptable date.
     check () {
       let self = this
-      if (self.houses.includes(this.address)) {
-        var spot = self.houses.indexOf(self.address)
+      if (self.houses.includes(this.claim.addresss)) {
+        var spot = self.houses.indexOf(self.claim.addresss)
         self.claim.house_assetId = self.ids[spot]
-        self.claim.addresss = self.address
         self.saveRecord()
       } else {
-        self.address = ''
+        self.claim.addresss = ''
         window.alert("Make sure to enter a registered house! Don't see the house you're looking for? Register it now!")
       }
     },
@@ -183,7 +183,7 @@ export default {
       }
       try {
         simbaApi.signTxn('transaction/' + txnId + '/', payload).then(function () {
-          self.recordSigned = true
+          self.$parent.makeToast('The transaction was signed, congratulations!!!', 'success', 'Claim')
           self.isSigning = false
         })
       } catch (e) {
@@ -203,7 +203,7 @@ export default {
     // posts all the data to Simba Chain
     saveRecord (e) {
       if (!this.getWallet()) {
-        this.noWalletLogged = true
+        this.$parent.makeToast('Please click the wallet button on the top right corner to login!!!', 'danger', 'Ethereum Wallet')
         return
       }
       this.sending = true
@@ -233,7 +233,7 @@ export default {
           self.txnId = res.data.id
           self.unsignedTxn = res.data.payload.raw
           self.getCurrentWallet()
-          self.recordSaved = true
+          self.$parent.makeToast('The transaction was posted!!!', 'success', 'Claim')
           self.sending = false
           self.clearForm()
           self.currentClaim = !self.currentClaim
@@ -242,31 +242,56 @@ export default {
         console.log(e)
       }
     }
+  },
+
+  computed: {
+    matches () {
+      if (this.claim.addresss == '') {
+        return []
+      }
+      return this.houses.filter((item) => item.toLowerCase().includes(this.claim.addresss.toLowerCase()))
+    }
   }
 }
 
 </script>
 
 <style scoped>
-  .md-progress-bar {
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-  }
-  .post-form {
-    margin-top: 40px;
-    height: 550px;
-  }
-  .title {
-    font-size: 20px;
-    margin-left: 10px;
-    margin-top: 7px;
-  }
   .post-card {
     margin: 10px;
   }
   #denied {
     text-align: center;
+  }
+
+  /* the following styling is for autocomplete
+  See note at top of methods */
+  .options {
+      max-height: 150px;
+      overflow-y: scroll;
+      margin-top: 5px;
+  }
+  .options ul {
+      list-style-type: none;
+      text-align: left;
+      padding-left: 0;
+  }
+  .options ul li {
+      border-bottom: 1px solid lightgray;
+      padding: 10px;
+      cursor: pointer;
+      background: #f1f1f1;
+  }
+  .options ul li:first-child {
+      border-top: 2px solid #d6d6d6;
+  }
+  .options ul li:not(.selected):hover {
+      background: #8c8c8c;
+      color: #fff;
+  }
+  .options ul li.selected {
+      background: #58bd4c;
+      color: #fff;
+      font-weight: 600;
   }
 </style>

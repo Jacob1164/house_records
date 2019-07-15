@@ -1,201 +1,119 @@
 <template>
   <div class="page-container unselectable">
-    <md-app md-waterfall md-mode="fixed-last">
-      <md-app-toolbar class="md-dense md-primary tool-bar">
-        <div class="md-toolbar-row">
-          <div class="md-toolbar-section-start">
-            <md-button class="md-icon-button" @click="menuVisible = !menuVisible">
-              <md-icon>menu</md-icon>
-            </md-button>
-            <h3 class="md-title">House Demo</h3>
-            <md-button to="/">Home</md-button>
-            <md-button to="/register">Register a House</md-button>
-            <md-button v-if="loggedIn" to="/post">Add Records</md-button>
-            <md-button v-if="loggedIn && accountInfo.role == 'ho'" to="/claim">Claim Your House</md-button>
-          </div>
+    <b-navbar variant="warning">
+      <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+      <b-collapse id="nav-collapse" is-nav>
+        <b-navbar-nav>
+          <b-navbar-brand>House Demo</b-navbar-brand>
+          <b-nav-item to="/">Home</b-nav-item>
+          <b-nav-item to="/register">Register a House</b-nav-item>
+          <b-nav-item v-if="loggedIn" to="/post">Add Records</b-nav-item>
+          <b-nav-item v-if="loggedIn && accountInfo.role == 'ho'" to="/claim">Claim Your House</b-nav-item>
+        </b-navbar-nav>
 
-          <div class="md-toolbar-section-end">
-            <span v-if="loggedIn">
-              <md-button class="md-icon-button" @click="setAccount(true)">
-                <md-icon>account_circle</md-icon>
-              </md-button>
-              <md-tooltip md-delay="500" md-direction="left">Account</md-tooltip>
-            </span>
-            <span>
-              <md-button class="md-icon-button" @click="setInfo(true)">
-                <md-icon>info</md-icon>
-              </md-button>
-              <md-tooltip md-delay="500" md-direction="left">Info</md-tooltip>
-            </span>
-            <span>
-              <md-button class="md-icon-button" @click="showWallet(true)">
-                <span v-if="hasWallet">
-                  <md-icon style="color: #00c853;">account_balance_wallet</md-icon>
-                </span>
-                <span v-else>
-                  <md-icon>account_balance_wallet</md-icon>
-                </span>
-              </md-button>
-              <md-tooltip md-delay="500" md-direction="left">Wallet</md-tooltip>
-            </span>
-            <md-button v-if="loggedIn" id="logout" @click="logout()">Log Out</md-button>
-            <md-button v-if="!loggedIn" to="/account/login" id="log">Log in</md-button>
-            <md-button v-if="!loggedIn" to="/account/signup" id="sign">Sign up</md-button>
-          </div>
+        <b-navbar-nav class="ml-auto">
+          <b-nav-item v-if="loggedIn">
+            <b-button v-b-tooltip.hover title="Accountt" pill variant="outline-light" @click="setAccount(true)">
+              <img class="icon" src="./components/icons/person.svg" alt="person">
+            </b-button>
+          </b-nav-item>
 
-          <md-dialog :md-active.sync="info">
-            <md-toolbar class="md-accent md-dense">
-              <h3 class="md-title" style="flex: 1">Website Info</h3>
-              <md-button class="md-icon-button" @click="setInfo(false)">
-                <md-icon>close</md-icon>
-              </md-button>
-            </md-toolbar>
-            <div class="md-body-2 space">
-              <div>Use the map on the main page to find a registered house.</div>
-              <div>If you click on a pin, you can go to a page with all the records for that house.</div>
-              <div>Go the register a house page to add a new house to the map.</div>
-              <div>Login/Sign up as either a real estate agent, insurance agent, inspector, or home owner to add records to a house.</div>
-            </div>
-          </md-dialog>
+          <b-nav-item>
+            <b-button v-b-tooltip.hover title="Info" pill variant="outline-light" @click="info = !info">
+              <img class="icon" src="./components/icons/info.svg" alt="info">
+            </b-button>
+          </b-nav-item>
 
-          <md-dialog :md-active.sync="account">
-            <md-toolbar class="md-accent md-dense">
-              <h3 class="md-title" style="flex: 1">Account Info</h3>
-              <md-button class="md-icon-button" @click="setAccount(false)">
-                <md-icon>close</md-icon>
-              </md-button>
-            </md-toolbar>
-            <div class="space">
-              <div class="md-title">{{accountInfo.first}} {{accountInfo.last}}</div>
-              <div class="md-body-1"><strong>Email: </strong>{{accountInfo.email}}</div>
-              <div class="md-body-1"><strong>Role: </strong>{{accountInfo.displayRole}}</div>
-            </div>
-          </md-dialog>
+          <b-nav-item>
+            <b-button v-b-tooltip.hover title="Wallet" pill variant="outline-light" @click="isWallet = !isWallet" v-if="hasWallet">
+              <div class="fill"><img class="icon fill" src="./components/icons/credit-card.svg" alt="creidt card"></div>
+            </b-button>
+            <b-button v-b-tooltip.hover title="Wallet" pill variant="outline-light" @click="isWallet = !isWallet" v-else>
+              <img class="icon" src="./components/icons/credit-card.svg" alt="creidt card">
+            </b-button>
+          </b-nav-item>
+        </b-navbar-nav>
+        <b-navbar-nav class="ml">
+          <b-nav-item v-if="loggedIn" id="logout" @click="logout()">Log Out</b-nav-item>
+          <b-nav-item v-if="!loggedIn" to="/account/login" id="log">Log in</b-nav-item>
+          <b-nav-item v-if="!loggedIn" to="/account/signup" id="sign">Sign up</b-nav-item>
+        </b-navbar-nav>
+      </b-collapse>
+    </b-navbar>
 
-          <md-dialog class="wallet" :md-active.sync="isWallet">
-            <md-toolbar class="md-accent md-dense">
-              <h3 class="md-title" style="flex: 1">Ethereum Wallet</h3>
-                <md-button class="md-icon-button" @click="setWalletStatus('close')">
-                  <md-icon>close</md-icon>
-                </md-button>
-            </md-toolbar>
+    <b-modal v-model="info" title="Website Info" :ok-only="true">
+      <div class="d-block text-center">
+        <small>Use the map on the main page to find a registered house.</small>
+        <br><small>If you click on a pin, you can go to a page with all the records for that house.</small>
+        <br><small>Go the register a house page to add a new house to the map.</small>
+        <br><small>Login/Sign up as either a real estate agent, insurance agent, inspector, or home owner to add records to a house.</small>
+      </div>
+    </b-modal>
 
-            <div v-if="isCreate">
-              <div class="wallet-content">
-                <div class="md-subheading">
-                  Create a new Ethereum Account
-                </div>
-                <br>
-                <br>
-                <br>
-              </div>
-              <md-dialog-actions class="md-layout md-alignment-center-space-between">
-                <md-button class="md-accent" @click="setWalletStatus('restore')">Restore</md-button>
-                <md-button class="md-accent md-raised" @click="createWallet()">Create</md-button>
-              </md-dialog-actions>
-            </div>
+    <b-modal v-model="account" title="Account Info" :ok-only="true">
+      <div>
+        <h4>{{accountInfo.first}} {{accountInfo.last}}</h4>
+        <h6><strong>Email: </strong>{{accountInfo.email}}</h6>
+        <h6><strong>Role: </strong>{{accountInfo.displayRole}}</h6>
+      </div>
+    </b-modal>
 
-            <div v-if="isRestore">
-              <div class="wallet-content">
-                <div class="md-subheading">
-                  Restore your Ethereum Account with Seed
-                </div>
-                <br>
-                <div class="md-caption">
-                  Please type your seed (12 mnemonic words) to restore
-                </div>
-                <div class="md-layout-item md-size-70">
-                  <md-field>
-                    <label>Wallet Seed</label>
-                    <md-textarea md-autogrow v-model="restoreSeed"></md-textarea>
-                  </md-field>
-                </div>
-                <br>
-                <br>
-                <br>
-              </div>
-              <md-dialog-actions class="md-layout md-alignment-center-space-between">
-                <md-button class="md-accent" @click="setWalletStatus('create')">Create</md-button>
-                <md-button class="md-accent md-raised" @click="restoreWallet()">Restore</md-button>
-              </md-dialog-actions>
-              <md-snackbar :md-active.sync="invalidSeed">The seed is invalid, please check again!!!</md-snackbar>
-            </div>
-
-            <div v-if="isUnlock">
-              <div class="wallet-content">
-                <div class="md-subheading">
-                  Unlock Your Account
-                </div>
-                <br>
-                <br>
-                <br>
-              </div>
-              <md-dialog-actions class="md-layout md-alignment-center-space-between">
-                <md-button @click="logoutWallet">Logout</md-button>
-                <md-button class="md-accent md-raised" @click="unlockWallet">Unlock</md-button>
-              </md-dialog-actions>
-            </div>
-
-            <div v-if="isCheck">
-              <div class="wallet-content">
-                <div class="md-subheading">
-                  Ethereum Account Information
-                </div>
-                <br>
-                <div class="md-layout-item md-size-90">
-                  <md-field>
-                    <label>Account Address</label>
-                    <md-textarea md-autogrow v-model="accountAddress" readonly></md-textarea>
-                  </md-field>
-                </div>
-                <div v-if="isRevealed">
-                  <div class="md-layout-item md-size-90">
-                    <md-field>
-                      <label>Private Key</label>
-                      <md-textarea md-autogrow v-model="accountPk" readonly></md-textarea>
-                    </md-field>
-                  </div>
-                  <div class="md-layout-item md-size-90">
-                    <md-field>
-                      <label>Seed</label>
-                      <md-textarea md-autogrow v-model="accountSeed" readonly></md-textarea>
-                    </md-field>
-                  </div>
-                </div>
-              </div>
-              <md-dialog-actions class="md-layout md-alignment-center-space-between">
-                <md-button @click="logoutWallet">Logout</md-button>
-                <md-button class="md-accent md-raised" @click="isRevealed = true">Reveal</md-button>
-              </md-dialog-actions>
-            </div>
-          </md-dialog>
+    <b-modal class="wallet" v-model="isWallet" title="Ethereum Wallet" :ok-only="true" ok-title="Cancel">
+      <div v-if="isCreate">
+        <div>
+          <h6>Create a new Ethereum Account</h6>
+          <br>
         </div>
-      </md-app-toolbar>
+        <b-button variant="primary" @click="setWalletStatus('restore')">Restore</b-button>
+        <b-button variant="primary" @click="createWallet()">Create</b-button>
+      </div>
 
-      <md-app-drawer :md-active.sync="menuVisible">
-        <md-toolbar class="md-transparent avatar" md-elevation="0">
-          <md-icon class="md-size-3x">house</md-icon>
-        </md-toolbar>
-        <div id="menuTitle" class="md-subheading title md-size-3x">House Demo</div>
-        <md-list>
-          <md-list-item href="https://app.simbachain.com/" target="_blank" @click="menuVisible = false">
-            <md-icon>apps</md-icon>
-            <span class="md-list-item-text">SIMBA&#8482; Dashboard</span>
-          </md-list-item>
-          <md-list-item href="https://developers.google.com/maps/documentation/" target="_blank" @click="menuVisible = false">
-            <md-icon>place</md-icon>
-            <span class="md-list-item-text">Google Maps API</span>
-          </md-list-item>
-        </md-list>
-      </md-app-drawer>
+      <div v-if="isRestore">
+        <div>
+          <h6>Restore your Ethereum Account with Seed</h6>
+          <small>Please type your seed (12 mnemonic words) to restore</small><br>
+          <div class="md-layout-item md-size-70"> <!-- -->
+            <b-form-group>
+              <label for="resotreSeed">Wallet Seed</label>
+              <b-form-textarea id="resotreSeed" rows="2" max-rows="4" v-model="restoreSeed" placeholder="Wallet Seed" no-resize></b-form-textarea>
+            </b-form-group>
+          </div><br>
+        </div>
+        <b-button variant="primary" @click="setWalletStatus('create')">Create</b-button>
+        <b-button variant="primary" @click="restoreWallet()">Restore</b-button>
+      </div>
 
-      <md-app-content>
-        <router-view class="conent">
-        </router-view>
-      </md-app-content>
-    </md-app>
-      <md-snackbar :md-active.sync="createdWallet">We just created a wallet for you, check it out at the right-top corner : )</md-snackbar>
-      <md-snackbar :md-active.sync="depositedWallet">We deposited enough Ethers on this private network for you, please wait a while</md-snackbar>
+      <div v-if="isUnlock">
+        <h6>Unlock Your Account</h6><br>
+          <b-button variant="secondary" @click="logoutWallet">Logout</b-button>
+          <b-button variant="primary" @click="unlockWallet">Unlock</b-button>
+      </div>
+
+      <div v-if="isCheck">
+        <div>
+          <h6>Ethereum Account Information</h6>
+          <b-form-group>
+            <label for="accountAddress">Account Address</label>
+            <b-form-textarea id="accountAddress" v-model="accountAddress" :readonly="true" no-resize></b-form-textarea>
+          </b-form-group>
+          <div v-if="isRevealed">
+            <b-form-group>
+              <label for="accountPk">Private Key</label>
+              <b-form-textarea id="accountPk" v-model="accountPk" :readonly="true" no-resize></b-form-textarea>
+            </b-form-group>
+            <b-form-group>
+              <label for="accountSeed">Seed</label>
+              <b-form-textarea id="accountSeed" v-model="accountSeed" :readonly="true" no-resize></b-form-textarea>
+            </b-form-group>
+          </div>
+        </div>
+        <b-button variant="secondary" @click="logoutWallet">Logout</b-button>
+        <b-button variant="primary" @click="isRevealed = true">Reveal</b-button>
+      </div>
+    </b-modal>
+
+    <router-view class="conent">
+    </router-view>
   </div>
 </template>
 
@@ -219,6 +137,14 @@
   .space {
     padding: 8px;
   }
+  .icon {
+    width: 20px;
+    height: 20px;
+    fill: green;
+  }
+  .fill {
+    fill: green;
+  }
 </style>
 
 <script>
@@ -234,11 +160,9 @@ export default {
   data () {
     return {
       restoreSeed: null,
-      invalidSeed: null,
       accountAddress: null,
       accountPk: null,
       accountSeed: null,
-      menuVisible: false,
       isRevealed: false,
       isWallet: false,
       isCreate: false,
@@ -246,8 +170,6 @@ export default {
       isUnlock: false,
       isCheck: false,
       hasWallet: false,
-      createdWallet: false,
-      depositedWallet: false,
       info: false,
       account: false,
       accountInfo: {
@@ -261,8 +183,13 @@ export default {
     }
   },
   methods: {
-    setInfo (status) {
-      this.info = status
+    makeToast (message, variant, title) {
+    this.$bvToast.toast(message, {
+      title: title,
+      autoHideDelay: 4000,
+      variant: variant,
+      toaster: 'b-toaster-top-center'
+      })
     },
 
     setAccount (status) {
@@ -353,7 +280,7 @@ export default {
       let self = this
       try {
         manageApi.requestFund('requestFunds/', payload).then(function () {
-          self.depositedWallet = true
+          self.makeToast('We deposited enough Ethers on this private network for you, please wait a while', 'success', 'Ethereum Wallet')
         })
       } catch (e) {
         console.log(e)
@@ -362,11 +289,10 @@ export default {
     restoreWallet () {
       const mnemonic = this.restoreSeed
       if (!ethers.HDNode.isValidMnemonic(mnemonic)) {
-        this.invalidSeed = true
+        this.makeToast('The seed is invalid, please check again!!!', 'danger', 'Ethereum Wallet')
         this.cleanUp()
         return
       }
-      this.invalidSeed = false
       this.setWallet(mnemonic)
       this.checkWallet(mnemonic)
       this.depositAccount(mnemonic)
@@ -398,9 +324,6 @@ export default {
       this.setWalletStatus('create')
       this.hasWallet = false
     },
-    toggleMenu () {
-      this.menuVisible = !this.menuVisible
-    },
     logout () {
       this.loggedIn = false
       this.accountInfo.first = null
@@ -416,7 +339,7 @@ export default {
   mounted () {
     if (!localStorage.getItem('keystore')) {
       this.createWallet()
-      this.createdWallet = true
+      this.makeToast('We just created a wallet for you, check it out at the right-top corner : )', 'success', 'Ethereum Wallet')
     }
     if(localStorage.getItem('loggedIn') == true) {
       this.loggedIn = true

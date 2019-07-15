@@ -1,75 +1,66 @@
 <template>
   <div>
-    <div style="text-align: center;" class="md-layout md-gutter">
-      <div class="md-layout-item md-large-size-25 md-medium-size-20 md-small-size-15 md-xsmall-size-5"></div>
-      <md-card class="md-raised md-large-size-50 md-medium-size-60 md-small-size-70 md-xsmall-size-90 md-layout-item" id="card1">
-        <div class="md-display-1" style="color: white;">Sign Up</div>
+    <div class="row text-center">
+      <div class="col-xl-3 col-lg-3 col-md-2 col-sm-1 col-0"></div>
+      <div class="col-xl-6 col-lg-6 col-md-8 col-sm-10 col-12">
+        <b-card bg-variant="light" class="post-card" title="Sign Up">
+          <div class="row">
+            <div class="col-6">
+              <b-form-group description="First Name">
+                <b-form-input name="first" id="first" v-model="data.first" :disabled="sending"/>
+              </b-form-group>
+            </div>
+            <div class="col-6">
+              <b-form-group description="Last Name">
+                <b-form-input name="last" id="last" v-model="data.last" :disabled="sending"/>
+              </b-form-group>
+            </div>
+          </div>
 
-        <div class="md-layout md-gutter">
-          <div class="md-layout-item md-size-50">
-            <md-field>
-              <label for="first">First Name</label>
-              <md-input name="first" id="first" v-model="data.first" :disabled="sending"/>
-            </md-field>
+          <div class="row">
+            <div class="col-12">
+              <b-form-group description="Email">
+                <b-form-input name="email" id="email" v-model="data.email" :disabled="sending"/>
+              </b-form-group>
+            </div>
           </div>
-          <div class="md-layout-item md-size-50">
-            <md-field>
-              <label for="last">Last Name</label>
-              <md-input name="last" id="last" v-model="data.last" :disabled="sending"/>
-            </md-field>
-          </div>
-        </div>
 
-        <div class="md-layout md-gutter">
-          <div class="md-layout-item md-size-100">
-            <md-field>
-              <label for="email">Email</label>
-              <md-input name="email" id="email" v-model="data.email" :disabled="sending"/>
-            </md-field>
+          <div class="row">
+            <div class="col-12">
+              <b-form-group description="Role">
+                <b-form-select v-model="data.role" :disabled="sending">
+                  <option :value="null" selected>Please select a role</option>
+                  <option value="re">Real Estate Agent</option>
+                  <option value="ia">Insurance Agent</option>
+                  <option value="in">Inspector</option>
+                  <option value="ho">Home Owner</option>
+                </b-form-select>
+              </b-form-group>
+            </div>
           </div>
-        </div>
-
-        <div class="md-layout md-gutter">
-          <div class="md-layout-item md-size-100">
-            <md-radio v-model="data.role" value="re" unselected :disabled="sending">Real Estate Agent</md-radio>
-            <md-radio v-model="data.role" value="ia" unselected :disabled="sending">Insurance Agent</md-radio>
-            <md-radio v-model="data.role" value="in" unselected :disabled="sending">Inspector</md-radio>
-            <md-radio v-model="data.role" value="ho" unselected :disabled="sending">Home Owner</md-radio>
+          <div class="row">
+            <div class="col-12">
+              <b-form-group description="Username">
+                <b-form-input name="username" id="username" v-model="data.username" :disabled="sending"/>
+              </b-form-group>
+            </div>
           </div>
-        </div>
-        <div class="md-layout md-gutter">
-          <div class="md-layout-item md-size-100">
-            <md-field>
-              <label for="username">Username</label>
-              <md-input name="username" id="username" v-model="data.username" :disabled="sending"/>
-            </md-field>
+          <div class="row">
+            <div class="col-12">
+              <b-form-group description="Password">
+                <b-form-input type="password" name="password" id="password" v-model="data.password" :disabled="sending"/>
+              </b-form-group>
+            </div>
           </div>
-        </div>
-        <div class="md-layout md-gutter">
-          <div class="md-layout-item md-size-100">
-            <md-field>
-              <label for="password">Password</label>
-              <md-input type="password" name="password" id="password" v-model="data.password" :disabled="sending"/>
-            </md-field>
-          </div>
-        </div>
-        <md-progress-bar class="md-accent md-progress-bar" md-mode="indeterminate" v-if="sending"/>
-        <div>
-          <md-button class="md-accent md-raised" :disabled="!(data.username && data.password && data.first && data.last && data.email && data.role)" @click="submit()">Sign Up</md-button>
-        </div>
-      </md-card>
-      <div class="md-layout-item md-large-size-25 md-medium-size-20 md-small-size-15 md-xsmall-size-5"></div>
+          <b-button variant="outline-success" v-if="!(data.username && data.password && data.first && data.last && data.email && data.role)" disabled>Sign Up</b-button>
+          <b-button variant="success" v-else @click="submit()">Sign Up</b-button>
+        </b-card>
+        <b-spinner variant="primary" v-if="sending" label="Loading..."></b-spinner>
+        <b-alert v-model="userAlreadyExists" dismissible variant="danger">The username '<strong>{{ invalid }}</strong>' already exists. Please pick another username.</b-alert>
+        <b-alert v-model="passwordTooShort" dismissible variant="danger">Your password must be at least 5 characters long.</b-alert>
+      </div>
+      <div class="col-md-auto"></div>
     </div>
-    <div class="errMessage" v-if="userAlreadyExists">
-      <div class="md-body-2">The username '<strong>{{ invalid }}</strong>' already exists. Please pick another username.</div>
-    </div>
-    <div class="errMessage" v-if="passwordTooShort">
-      <div class="md-body-2">Your password must be at least 5 characters long.</div>
-    </div>
-
-     <md-snackbar :md-active.sync="noWalletLogged">Please click the wallet button on the top right corner to login!!!</md-snackbar>
-     <md-snackbar :md-active.sync="recordSaved">The transaction was Posted, sign with your wallet now!!!</md-snackbar>
-     <md-snackbar :md-active.sync="recordSigned">The transaction was Signed, Congratulations!!!</md-snackbar>
   </div>
 </template>
 
@@ -101,13 +92,10 @@ export default {
       invalid: null,
       passwordTooShort: false,
 
-      noWalletLogged: false,
       sending: false,
       unsignedTxn: null,
       txnId: null,
-      recordSigned: false,
       isSigning: false,
-      recordSaved: false
 
     }
   },
@@ -130,6 +118,7 @@ export default {
 
   methods: {
     submit () {
+      var passwordHash = require('password-hash')
       this.userAlreadyExists = false
       this.passwordTooShort = false
       let self = this
@@ -141,6 +130,7 @@ export default {
         self.passwordTooShort = true
         return
       }
+      self.data.password = passwordHash.generate(self.data.password)
       this.data.assetId = this.numOfUsers
       this.saveRecord()
     },
@@ -171,7 +161,7 @@ export default {
       }
       try {
         simbaApi.signTxn('transaction/' + txnId + '/', payload).then(function () {
-          self.recordSigned = true
+          self.$parent.makeToast('The transaction was signed, congratulations!!!', 'success', 'Sign Up')
           self.isSigning = false
         })
       } catch (e) {
@@ -182,7 +172,7 @@ export default {
     // posts all the data to Simba Chain
     saveRecord (e) {
       if (!this.getWallet()) {
-        this.noWalletLogged = true
+        this.$parent.makeToast('Please click the wallet button on the top right corner to login!!!', 'danger', 'Ethereum Wallet')
         return
       }
       this.sending = true
@@ -204,11 +194,9 @@ export default {
           self.txnId = res.data.id
           self.unsignedTxn = res.data.payload.raw
           self.getCurrentWallet()
-          self.recordSaved = true
+          self.$parent.makeToast('The transaction was posted!!!', 'success', 'Sign Up')
           self.sending = false
-          setTimeout(function () {
-            self.$router.push('/account/login')
-          }, 1500)
+          self.$router.push('/account/login')
         })
       } catch (e) {
         console.log(e)
@@ -225,11 +213,8 @@ export default {
   right: 0;
   left: 0;
 }
-#card1 {
-  margin: 0 auto; /* Added */
-  float: none; /* Added */
-  margin-bottom: 10px; /* Added */
-  padding: 8px;
+.post-card {
+  margin: 10px;
 }
 .errMessage {
   color: white;

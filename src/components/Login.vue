@@ -1,36 +1,31 @@
 <template>
   <div>
-    <div style="text-align: center;" class="md-layout md-gutter">
-      <div class="md-layout-item md-large-size-25 md-medium-size-20 md-small-size-10 md-xsmall-size-0"></div>
-      <md-card class="md-raised md-large-size-50 md-medium-size-60 md-small-size-80 md-xsmall-size-100 md-layout-item" id="card1">
-        <div class="md-display-1" style="color: white;">Log In</div>
-        <div class="md-layout md-gutter">
-          <div class="md-layout-item md-size-100">
-            <md-field>
-              <label for="username">Username</label>
-              <md-input name="username" id="username" v-model="username"/>
-            </md-field>
+    <div class="row text-center">
+      <div class="col-xl-3 col-lg-3 col-md-2 col-sm-1 col-0"></div>
+      <div class="col-xl-6 col-lg-6 col-md-8 col-sm-10 col-12">
+        <b-card bg-variant="light" class="post-card" title="Log In">
+          <div class="row">
+            <div class="col-12">
+              <b-form-group description="Username">
+                <b-form-input name="username" id="username" v-model="username"/>
+              </b-form-group>
+            </div>
           </div>
-        </div>
-        <div class="md-layout md-gutter">
-          <div class="md-layout-item md-size-100">
-            <md-field>
-              <label for="password">Password</label>
-              <md-input type="password" name="password" id="password" v-model="password"/>
-            </md-field>
+          <div class="row">
+            <div class="col-12">
+              <b-form-group description="Password">
+                <b-form-input type="password" name="password" id="password" v-model="password"/>
+              </b-form-group>
+            </div>
           </div>
-        </div>
-        <div>
-          <md-button to="" class="md-accent md-raised" :disabled="!(username && password)" @click="submit()">Log In</md-button>
-        </div>
-      </md-card>
-      <div class="md-layout-item md-large-size-25 md-medium-size-20 md-small-size-10 md-xsmall-size-0"></div>
-    </div>
-    <div class="errMessage" v-if="noUserMatch">
-      <div class="md-body-2">There are no accounts with username '<strong>{{ wrong }}</strong>'</div>
-    </div>
-    <div class="errMessage" v-if="wrongPass">
-      <div class="md-body-2">The password entered is incorrect</div>
+          <b-button variant="outline-primary" v-if="!(username && password)" @click="submit()" disabled>Log In</b-button>
+          <b-button variant="primary" v-if="(username && password)" @click="submit()">Log In</b-button>
+        </b-card>
+        <b-spinner variant="primary" v-if="loading" label="Loading..."></b-spinner>
+        <b-alert v-model="noUserMatch" dismissible variant="danger">There are no accounts with username '<strong>{{ wrong }}</strong>'.</b-alert>
+        <b-alert v-model="wrongPass" dismissible variant="danger">The password entered is incorrect.</b-alert>
+      </div>
+      <div class="col-md-auto"></div>
     </div>
   </div>
 </template>
@@ -52,26 +47,33 @@ export default {
       results: null,
       noUserMatch: false,
       wrong: null,
-      wrongPass: false
+      wrongPass: false,
+      loading: false
     }
+  },
+
+  mounted () {
   },
 
   methods: {
     submit () {
+      this.loading = true
       var url = 'create_user/?username_exact=' + this.username
+      var passwordHash = require('password-hash')
       this.noUserMatch = false
       this.wrongPass = false
       let self = this
-      let parent = this.$parent.$parent.$parent.$parent
+      let parent = this.$parent
       try {
         simbaApi.getData(url)
           .then(function (response) {
             let results = response.data.results
+            self.loading = false
             if (results.length != 1) {
               self.noUserMatch = true
               self.wrong = self.username
               return
-            } else if (!(results[0].payload.inputs.password == self.password)) {
+            } else if (!(passwordHash.verify(self.password, results[0].payload.inputs.password))) {
               self.wrongPass = true
               return
             } else {
@@ -89,6 +91,7 @@ export default {
           })
       } catch (e) {
         console.log(e)
+        self.loading = false
       }
     }
   }
@@ -96,11 +99,8 @@ export default {
 </script>
 
 <style>
-#card1 {
-  margin: 0 auto; /* Added */
-  float: none; /* Added */
-  margin-bottom: 10px; /* Added */
-  padding: 8px;
+.post-card {
+  margin: 10px;
 }
 
 .errMessage {
