@@ -102,15 +102,4 @@ export default {
 .post-card {
   margin: 10px;
 }
-
-.errMessage {
-  color: white;
-  background-color: rgb(255, 79, 71);
-  text-align: center;
-  margin: 0 auto; /* Added */
-  float: none; /* Added */
-  margin-bottom: 10px; /* Added */
-  width: 50%;
-  border-radius: 15px;
-}
 </style>

@@ -118,9 +118,6 @@
 </template>
 
 <style lang="css" scoped>
-  .md-app {
-    height: 100vh;
-  }
   .unselectable {
     user-drag: none;
     -webkit-user-drag: none;
@@ -128,19 +125,9 @@
   .wallet {
     min-width: 320px;
   }
-  .wallet-content {
-    margin: 20px;
-  }
-  #menuTitle {
-    text-align: center;
-  }
-  .space {
-    padding: 8px;
-  }
   .icon {
     width: 20px;
     height: 20px;
-    fill: green;
   }
   .fill {
     fill: green;
@@ -188,7 +175,7 @@ export default {
       title: title,
       autoHideDelay: 4000,
       variant: variant,
-      toaster: 'b-toaster-top-center'
+      toaster: 'b-toaster-top-right'
       })
     },
 

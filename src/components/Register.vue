@@ -229,21 +229,6 @@ export default {
 </script>
 
 <style scoped>
-.md-progress-bar {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-}
-.post-form {
-  margin-top: 40px;
-  height: 550px;
-}
-.title {
-  font-size: 20px;
-  margin-left: 10px;
-  margin-top: 7px;
-}
 .post-card {
   margin: 10px;
 }

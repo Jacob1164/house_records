@@ -151,9 +151,6 @@ export default {
 </script>
 
 <style>
-.move {
-  margin-left: 14px;
-}
 .tree-view-item-key {
   color: rgb(0, 108, 255);
 }
@@ -166,12 +163,6 @@ export default {
 .tree-view-item-value-number {
   color: rgb(0, 175, 59);
 }
-#map_pic {
-  position: fixed;
-  right: 10px;
-  height: 50vh;
-  width: 20vw;
-}
 .post-card {
   margin: 10px;
 }
@@ -182,6 +173,5 @@ img {
 .icon {
   width: 17px;
   height: 17px;
-  fill: green;
 }
 </style>

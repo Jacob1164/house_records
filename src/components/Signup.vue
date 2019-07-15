@@ -20,7 +20,7 @@
           <div class="row">
             <div class="col-12">
               <b-form-group description="Email">
-                <b-form-input name="email" id="email" v-model="data.email" :disabled="sending"/>
+                <b-form-input name="email" id="email" type="email" v-model="data.email" :disabled="sending"/>
               </b-form-group>
             </div>
           </div>
@@ -29,7 +29,7 @@
             <div class="col-12">
               <b-form-group description="Role">
                 <b-form-select v-model="data.role" :disabled="sending">
-                  <option :value="null" selected>Please select a role</option>
+                  <option :value="null" selected disabled>Please select a role</option>
                   <option value="re">Real Estate Agent</option>
                   <option value="ia">Insurance Agent</option>
                   <option value="in">Inspector</option>
@@ -207,23 +207,7 @@ export default {
 </script>
 
 <style>
-.md-progress-bar {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-}
 .post-card {
   margin: 10px;
-}
-.errMessage {
-  color: white;
-  background-color: rgb(255, 79, 71);
-  text-align: center;
-  margin: 0 auto; /* Added */
-  float: none; /* Added */
-  margin-bottom: 10px; /* Added */
-  width: 50%;
-  border-radius: 15px;
 }
 </style>
