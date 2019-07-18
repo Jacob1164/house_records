@@ -3,7 +3,7 @@ import axios from 'axios'
 const HTTP = axios.create({
   baseURL: 'https://api.simbachain.com/v1-management/',
   headers: {
-    'APIKEY': '939d14c858c238a15dca900ceed08b6b7be8e1e621fe17bfdee86d54389510c0'
+    'APIKEY': '[YOUR API KEY HERE]'
   }
 })
 

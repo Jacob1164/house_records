@@ -1,21 +1,29 @@
 <template>
   <div>
     <div v-if="loggedIn">
-      <div v-if="claimedHouse || showRE || showIN || showIA">
-        <b-card bg-variant="light" class="col-xl-9 col-lg-10 col-md-11 col-sm-12 col-12 post-card" :title="title" :sub-title="subtitle">
-          <p v-if="!showHO">Don't see the address you're looking for? Make sure to register the home first!</p>
+      <div>
+        <b-card class="col-xl-9 col-lg-10 col-md-11 col-sm-12 col-12 post-card" bg-variant="light" v-if="showIN" title="Choose which form you would like to submit">
+          <b-form-group>
+            <b-form-radio-group buttons button-variant="outline-primary">
+              <b-form-radio v-model="reno" :value="false">Inspection</b-form-radio>
+              <b-form-radio v-model="reno" :value="true">Home Improvement</b-form-radio>
+            </b-form-radio-group>
+          </b-form-group>
+        </b-card>
+        <b-card bg-variant="light" class="col-xl-9 col-lg-10 col-md-11 col-sm-12 col-12 post-card" :title="title" :sub-title="subtitle" v-if="!reno">
+          <p>Don't see the address you're looking for? Make sure to register the home first!</p>
           <div class="row">
-            <div class="col-9">
+            <div class="col-12 col-md-6 col-lg-9">
               <b-form-group description="Address">
-                <b-form-input name="address" id="address" v-model="address" :disabled="sending || claimedHouse" placeholder="Address" v-on:keyup="toggleVisible()"/>
-                <div class="options" v-if="visible && !(showHO)">
+                <b-form-input name="address" id="address" v-model="address" :disabled="sending" placeholder="Address" v-on:keyup="visible = true"/>
+                <div class="options" v-if="visible">
                   <ul>
                     <li v-for="(match, index) in matches" :key="index" v-text="match" @click="itemClicked(index)"></li>
                   </ul>
                 </div>
               </b-form-group>
             </div>
-            <div class="col-3">
+            <div class="col-12 col-md-6 col-lg-3">
               <b-form-group description="Date">
                 <b-form-input type="date" name="date" id="date" v-model="date" :disabled="sending"/>
               </b-form-group>
@@ -24,24 +32,24 @@
 
           <div v-if="showRE">
             <div class="row">
-              <div class="col-6">
+              <div class="col-sm-6 col-12">
                 <b-form-group description="Previous Owner">
                   <b-form-input name="prev_owner" id="prev_owner" v-model="form2.prev_owner" :disabled="sending" />
                 </b-form-group>
               </div>
-              <div class="col-6">
+              <div class="col-sm-6 col-12">
                 <b-form-group description="New Owner">
                   <b-form-input name="new_owner" id="new_owner" v-model="form2.new_owner" :disabled="sending" />
                 </b-form-group>
               </div>
             </div>
             <div class="row">
-              <div class="col-6">
+              <div class="col-sm-6 col-12">
                 <b-form-group description="Real Estate Agent's Name">
                   <b-form-input name="real_estate_agent" id="real_estate_agent" v-model="form2.real_estate_agent" :disabled="sending" />
                 </b-form-group>
               </div>
-              <div class="col-6">
+              <div class="col-sm-6 col-12">
                 <b-form-group description="Price">
                   <div class="input-group mb-3">
                     <div class="input-group-prepend">
@@ -56,12 +64,12 @@
 
           <div v-if="showIA">
             <div class="row">
-              <div class="col-8">
+              <div class="col-12 col-md-6 col-lg-8">
                 <b-form-group description="Type of Incident">
                   <b-form-input name="incident" id="incident" v-model="form3.incident" :disabled="sending" />
                 </b-form-group>
               </div>
-              <div class="col-4">
+              <div class="col-12 col-md-6 col-lg-4">
                 <b-form-group description="Estimated Damages ($)">
                   <div class="input-group mb-3">
                     <div class="input-group-prepend">
@@ -73,12 +81,12 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-6">
+              <div class="col-12 col-sm-6">
                 <b-form-group description="Insurance Agent's Name">
                   <b-form-input name="insurance_agent" id="insurance_agent" v-model="form3.insurance_agent" :disabled="sending" />
                 </b-form-group>
               </div>
-              <div class="col-6">
+              <div class="col-12 col-sm-6">
                 <b-form-group description="Owner">
                   <b-form-input name="owner" id="owner" v-model="form3.owner" :disabled="sending" />
                 </b-form-group>
@@ -95,12 +103,12 @@
 
           <div v-if="showIN">
             <div class="row">
-              <div class="col-8">
+              <div class="col-12 col-md-6 col-lg-8">
                 <b-form-group description="Inspector's Name">
                   <b-form-input name="inspector" id="inspector" v-model="form4.inspector" :disabled="sending" />
                 </b-form-group>
               </div>
-              <div class="col-4">
+              <div class=" col-12 col-md-6 col-lg-4">
                 <b-form-group description="House's Value">
                   <div class="input-group mb-3">
                     <div class="input-group-prepend">
@@ -120,57 +128,86 @@
             </div>
           </div>
 
-          <div v-if="showHO">
-            <div v-if="claimedHouse == true">
-              <div class="row">
-                <div class="col-6">
-                  <b-form-group description="Owner">
-                    <b-form-input name="owner" id="owner" v-model="form5.owner" disabled/>
-                  </b-form-group>
-                </div>
-                <div class="col-6">
-                  <b-form-group description="Value Added to House">
-                    <div class="input-group mb-3">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">$</span>
-                      </div>
-                      <b-form-input type="number" name="value_added" id="value_added" v-model="form5.value_added" :disabled="sending" />
-                    </div>
-                  </b-form-group>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-12">
-                  <b-form-group description="Improvement Made">
-                    <b-form-input name="improvement" id="improvement" v-model="form5.improvement" :disabled="sending" />
-                  </b-form-group>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-12">
-                  <b-form-group description="Notes">
-                    <b-form-textarea class="md-textarea" name="notes" id="notes" v-model="form5.notes" :disabled="sending"></b-form-textarea>
-                  </b-form-group>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <b-button v-if="showRE && !(address && date && form2.prev_owner && form2.new_owner && form2.real_estate_agent && form2.price)" variant="outline-success" disabled>Submit</b-button>
           <b-button v-if="showIA && !(address && date && form3.incident && form3.owner && form3.insurance_agent && form3.estimated_damages && form3.notes)" variant="outline-success" disabled>Submit</b-button>
           <b-button v-if="showIN && !(address && date && form4.inspector && form4.value && form4.notes)" variant="outline-success" disabled>Submit</b-button>
-          <b-button v-if="showHO && !(address && date && form5.owner && form5.improvement && form5.value_added && form5.notes)" variant="outline-success" disabled>Submit</b-button>
-          <b-button v-if="showRE && (address && date && form2.prev_owner && form2.new_owner && form2.real_estate_agent && form2.price)" type="submit" variant="success" v-on:click="check()">Submit</b-button>
-          <b-button v-if="showIA && (address && date && form3.incident && form3.owner && form3.insurance_agent && form3.estimated_damages && form3.notes)" type="submit" variant="success" v-on:click="check()">Submit</b-button>
-          <b-button v-if="showIN && (address && date && form4.inspector && form4.value && form4.notes)" type="submit" variant="success" v-on:click="check()">Submit</b-button>
-          <b-button v-if="showHO && (address && date && form5.owner && form5.improvement && form5.value_added && form5.notes)" type="submit" variant="success" v-on:click="check()">Submit</b-button>
+          <b-button v-if="showRE && (address && date && form2.prev_owner && form2.new_owner && form2.real_estate_agent && form2.price)" variant="success" v-on:click="check()">Submit</b-button>
+          <b-button v-if="showIA && (address && date && form3.incident && form3.owner && form3.insurance_agent && form3.estimated_damages && form3.notes)" variant="success" v-on:click="check()">Submit</b-button>
+          <b-button v-if="showIN && (address && date && form4.inspector && form4.value && form4.notes)" variant="success" v-on:click="check()">Submit</b-button>
 
           &nbsp; &nbsp; <b-spinner variant="primary" v-if="sending" label="Loading..."></b-spinner>
         </b-card>
-      </div>
-      <div v-if="(!claimedHouse) && showHO">
-        <b-card class="post-card" header-bg-variant="danger" bg-variant="light" header="Error">
-        <h5>You must claim a house as yours before you can log any home improvements. Click on the 'Claim Your House' tab now!</h5>
+        <b-card v-if="showIN && reno" bg-variant="light" title="Renovation" sub-title="Inspector/Government Assesor" class="col-xl-9 col-lg-10 col-md-11 col-sm-12 col-12 post-card">
+          <div>
+            <p>Don't see the address you're looking for? Make sure to register the home first!</p>
+            <div class="row">
+              <div class="col-12 col-md-6 col-lg-9">
+                <b-form-group description="Address">
+                  <b-form-input name="address" id="address" v-model="address" :disabled="sending" placeholder="Address" v-on:keyup="visible = true"/>
+                  <div class="options" v-if="visible">
+                    <ul>
+                      <li v-for="(match, index) in matches" :key="index" v-text="match" @click="itemClicked(index)"></li>
+                    </ul>
+                  </div>
+                </b-form-group>
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <b-form-group description="Date">
+                  <b-form-input type="date" name="date" id="date" v-model="date" :disabled="sending"/>
+                </b-form-group>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12 col-sm-6">
+                <b-form-group description="Type of Improvement">
+                  <b-form-input name="improvement" id="improvement" v-model="form5.improvement" :disabled="sending"/>
+                </b-form-group>
+              </div>
+              <div class="col-12 col-sm-6">
+                <b-form-group description="Value Added to House">
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">$</span>
+                    </div>
+                    <b-form-input type="number" name="value_added" id="value_added" v-model="form5.value_added" :disabled="sending" />
+                  </div>
+                </b-form-group>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12 col-sm-6">
+                <b-form-group description="# of Bedrooms">
+                  <b-form-input name="bedrooms" id="bedrooms" v-model="form5.bedrooms" :disabled="sending" />
+                </b-form-group>
+              </div>
+              <div class="col-12 col-sm-6">
+                <b-form-group description="# of Bathrooms">
+                  <b-form-input name="bathrooms" id="bathrooms" v-model="form5.bathrooms" :disabled="sending" />
+                </b-form-group>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12 col-sm-6">
+                <b-form-group description="Sqaure Footage">
+                  <b-form-input name="area" id="area" v-model="form5.area" :disabled="sending" />
+                </b-form-group>
+              </div>
+              <div class="col-12 col-sm-6">
+                <b-form-group description="# Acres on Lot">
+                  <b-form-input name="acres" id="acres" v-model="form5.acres" :disabled="sending" />
+                </b-form-group>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <b-form-group description="Notes/Description">
+                  <b-form-textarea class="md-textarea" name="notes" id="notes" v-model="form5.notes" :disabled="sending"></b-form-textarea>
+                </b-form-group>
+              </div>
+            </div>
+          </div>
+          <b-button v-if="renovation" type="submit" variant="success" v-on:click="check()">Submit</b-button>
+          <b-button v-if="!renovation" variant="outline-success" disabled>Submit</b-button>
         </b-card>
       </div>
     </div>
@@ -196,11 +233,6 @@ export default {
 
     // Get current houses
     this.getHouses()
-
-    if (this.showHO) {
-      this.form5.owner = this.$parent.accountInfo.first + ' ' + this.$parent.accountInfo.last
-      this.getClaimedHouse()
-    }
   },
   mixins: [localstorage],
 
@@ -211,17 +243,16 @@ export default {
     showRE: false,
     showIA: false,
     showIN: false,
-    showHO: false,
     date: null,
     houses: [],
     ids: [],
     dates: [],
     address: null,
     loggedIn: false,
-    claimedHouse: null,
     title: null,
     subtitle: null,
     visible: true,
+    reno: false,
 
     form2: {
       addresss: null,
@@ -253,22 +284,21 @@ export default {
 
     form5: {
       assetId: null,
-      owner: null,
       improvement: null,
       value_added: null,
       date: null,
-      notes: null
+      notes: null,
+      bedrooms: null,
+      bathrooms: null,
+      area: null,
+      acres: null
     }
 
   }),
   methods: {
-    // the following two methods are used for the autocomplete address search bar
+    // the following method is used for the autocomplete address search bar
     // thanks to AfikDeri for help with the autocomplete
     // https://github.com/AfikDeri/VueJS-Autocomplete
-    toggleVisible () {
-      this.visible = true
-    },
-
     itemClicked (index) {
       this.address = this.matches[index]
       this.visible = !this.visible
@@ -310,14 +340,13 @@ export default {
           } else if (self.showIA) {
             self.form3.assetId = self.ids[spot]
             self.form3.estimated_damages = Math.abs(Math.round(self.form3.estimated_damages))
-          } else if (self.showIN) {
+          } else if (self.showIN && !self.renovation) {
             self.form4.assetId = self.ids[spot]
             self.form4.value = Math.abs(Math.round(self.form4.value))
-          } else if (self.showHO) {
+          } else {
             self.form5.assetId = self.ids[spot]
             self.form5.value_added = Math.abs(Math.round(self.form5.value_added))
           }
-          self.date = self.date.toString().substring(4,10) + ',' + self.date.toString().substring(10,15)
           self.saveRecord()
         }
       } else {
@@ -325,30 +354,6 @@ export default {
         window.alert("Make sure to enter a registered house! Don't see the house you're looking for? Register it now!")
       }
 
-    },
-
-    getClaimedHouse () {
-      let self = this
-      let url = 'claim/?assetId_exact=' + localStorage.getItem('assetId')
-      try {
-        simbaApi.getData(url)
-          .then(function (response) {
-            if (response.data.results.count == 0) {
-              self.claimedHouse = false
-            } else {
-              let results = response.data.results[0]
-              if (results.payload.inputs.active) {
-                self.form5.assetId = response.data.results[0].payload.inputs.house_assetId
-                self.address = response.data.results[0].payload.inputs.addresss
-                self.claimedHouse = true
-              } else {
-                self.claimedHouse = false
-              }
-            }
-          })
-      } catch (e) {
-        console.log(e)
-      }
     },
 
     // wallet
@@ -392,7 +397,6 @@ export default {
           this.showRE = true
           this.showIA = false
           this.showIN = false
-          this.showHO = false
           this.title = 'Log a Sold House'
           this.subtitle = 'Real Estate Agent'
           break
@@ -400,7 +404,6 @@ export default {
           this.showRE = false
           this.showIA = true
           this.showIN = false
-          this.showHO = false
           this.title = 'File An Accident'
           this.subtitle = 'Insurance Agent'
           break
@@ -408,17 +411,8 @@ export default {
           this.showRE = false
           this.showIA = false
           this.showIN = true
-          this.showHO = false
-          this.title = 'File An Inspection'
-          this.subtitle = 'Inspector'
-          break
-        case 'ho':
-          this.showRE = false
-          this.showIA = false
-          this.showIN = false
-          this.showHO = true
-          this.title = 'Log a Home Improvement'
-          this.subtitle = 'Home Owner'
+          this.title = 'File An Inspection/Appraisal'
+          this.subtitle = 'Inspector/Government Assesor'
           break
       }
     },
@@ -444,10 +438,12 @@ export default {
       this.form5.improvement = null
       this.form5.value_added = null
       this.form5.notes = null
+      this.form5.bedrooms = null
+      this.form5.bathrooms = null
+      this.form5.area = null
+      this.form5.acres = null
       this.date = null
-      if (!this.showHO) {
-        this.address = null
-      }
+      this.address = null
     },
 
     // posts all the data to Simba Chain
@@ -462,10 +458,12 @@ export default {
       bodyFormData.append('from', this.getAddress())
 
       let method = null
+      this.date = new Date(this.date)
+      this.date = this.date.toString().substring(4,10) + ',' + this.date.toString().substring(10,15)
 
       if (this.showRE) {
         method = 'house_sale'
-        this.form2.date = new Date(this.date)
+        this.form2.date = this.date
         for (let k in this.form2) {
           if (this.form2.hasOwnProperty(k)) {
             bodyFormData.append(k, this.form2[k])
@@ -473,15 +471,15 @@ export default {
         }
       } else if (this.showIA) {
         method = 'accident'
-        this.form3.date = new Date(this.date)
+        this.form3.date = this.date
         for (let k in this.form3) {
           if (this.form3.hasOwnProperty(k)) {
             bodyFormData.append(k, this.form3[k])
           }
         }
-      } else if (this.showIN) {
+      } else if (this.showIN && !this.renovation) {
         method = 'appraisal'
-        this.form4.date = new Date(this.date)
+        this.form4.date = this.date
         for (let k in this.form4) {
           if (this.form4.hasOwnProperty(k)) {
             bodyFormData.append(k, this.form4[k])
@@ -489,7 +487,7 @@ export default {
         }
       } else {
         method = 'improvement'
-        this.form5.date = new Date(this.date)
+        this.form5.date = this.date
         for (let k in this.form5) {
           if (this.form5.hasOwnProperty(k)) {
             bodyFormData.append(k, this.form5[k])
@@ -514,15 +512,23 @@ export default {
   },
 
   computed: {
-    matches () {
-      if (this.address == '') {
+    matches: function () {
+      if (this.address === null) {
         return []
+      } else {
+        return this.houses.filter((item) => item.toLowerCase().includes(this.address.toLowerCase()))
       }
-      return this.houses.filter((item) => item.toLowerCase().includes(this.address.toLowerCase()))
+    },
+
+    renovation: function () {
+      if (this.address && this.date && this.form5.bedrooms && this.form5.improvement && this.form5.value_added && this.form5.notes && this.form5.bathrooms && this.form5.area && this.form5.acres) {
+        return true
+      } else {
+        return false
+      }
     }
   }
 }
-
 
 </script>
 

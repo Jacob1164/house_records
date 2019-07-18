@@ -3,20 +3,17 @@
     <div>
       <b-card bg-variant="light" class="col-xl-9 col-lg-10 col-md-11 col-sm-12 col-12 post-card" title="Register a Home" sub-title="Make sure to enter a valid address">
         <div class="row">
-          <div class="col-9">
+          <div class="col-12 col-lg-9">
             <b-form-group description="Address">
               <b-form-input name="address" id="address1" v-model="form1.addresss" :disabled="sending" placeholder=""/>
             </b-form-group>
           </div>
-          <div class="col-3">
+          <div class="col-12 col-sm-6 col-lg-3">
             <b-form-group description="Date">
               <b-form-input type="date" name="date" id="date" v-model="date" :disabled="sending"/>
             </b-form-group>
           </div>
-        </div>
-
-        <div class="row">
-          <div class="col-12">
+          <div class="col-12 col-sm-6 col-lg-12">
             <b-form-group description="Builder's Name">
               <b-form-input name="builder" id="builder" v-model="form1.builder" :disabled="sending" />
             </b-form-group>
@@ -24,8 +21,33 @@
         </div>
 
         <div class="row">
-          <b-button type="submit" variant="success" v-if="(form1.addresss && date && form1.builder && form1.lat && form1.lng)"  v-on:click="saveRecord()">Submit</b-button>
-          <b-button type="submit" variant="outline-success" v-if="!(form1.addresss && date && form1.builder && form1.lat && form1.lng)" disabled>Submit</b-button>
+          <div class="col-12 col-sm-6">
+            <b-form-group description="# of Bedrooms">
+              <b-form-input name="bedrooms" id="bedrooms" v-model="form1.bedrooms" :disabled="sending" />
+            </b-form-group>
+          </div>
+          <div class="col-12 col-sm-6">
+            <b-form-group description="# of Bathrooms">
+              <b-form-input name="bathrooms" id="bathrooms" v-model="form1.bathrooms" :disabled="sending" />
+            </b-form-group>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12 col-sm-6">
+            <b-form-group description="Sqaure Footage">
+              <b-form-input name="area" id="area" v-model="form1.area" :disabled="sending" />
+            </b-form-group>
+          </div>
+          <div class="col-12 col-sm-6">
+            <b-form-group description="# Acres on Lot">
+              <b-form-input name="acres" id="acres" v-model="form1.acres" :disabled="sending" />
+            </b-form-group>
+          </div>
+        </div>
+
+        <div class="row">
+          <b-button type="submit" variant="success" v-if="(form1.addresss && date && form1.builder && form1.lat && form1.lng && form1.bedrooms && form1.bathrooms && form1.area && form1.acres)"  v-on:click="saveRecord()">Submit</b-button>
+          <b-button type="submit" variant="outline-success" v-if="!(form1.addresss && date && form1.builder && form1.lat && form1.lng && form1.bedrooms && form1.bathrooms && form1.area && form1.acres)" disabled>Submit</b-button>
           &nbsp; &nbsp; <b-spinner variant="primary" v-if="sending" label="Loading..."></b-spinner>
         </div>
       </b-card>
@@ -83,6 +105,11 @@ export default {
       lat_neg: 0,
       lng_neg: 0,
       addresss: null,
+      bedrooms: null,
+      bathrooms: null,
+      area: null,
+      acres: null
+
     }
   }),
   methods: {
@@ -94,11 +121,8 @@ export default {
       geocoder.geocode( { 'address': address}, function(results, status) {
         if (status == 'OK') {
           self.form1.assetId = results[0].place_id
-          var lat = results[0].geometry.viewport.na
-          var lng = results[0].geometry.viewport.ga
-
-          var send_lat = Math.round(((lat.j + lat.l) / 2) * 10000000)
-          var send_lng = Math.round(((lng.j + lng.l) / 2) * 10000000)
+          var send_lat = Math.round(results[0].geometry.location.lat() * 10000000)
+          var send_lng = Math.round(results[0].geometry.location.lng() * 10000000)
 
           // for some reason, Simba does not accept negative integers
           // the following sets a separate boolean to true if the value is negative
@@ -173,6 +197,10 @@ export default {
       this.form1.lat_neg = 0
       this.form1.lng_neg = 0
       this.date = null
+      this.bedrooms = null
+      this.bathrooms = null
+      this.area = null
+      this.acres = null
     },
 
     // posts all the data to Simba Chain
@@ -187,6 +215,7 @@ export default {
         this.form1.lat_neg = null
         this.form1.lng_neg = null
         this.form1.assetId = null
+        this.form1.addresss = null
         return
       }
 
@@ -198,8 +227,12 @@ export default {
         this.date = new Date(this.date)
       }
 
-      this.sending = true
+      if(isNaN(this.form1.bedrooms) || isNaN(this.form1.bathrooms) || isNaN(this.form1.area) || isNaN(this.form1.acres)) {
+        window.alert('# of bedrooms, bathrooms, acres and square footage must all be a numerical value.')
+        return
+      }
 
+      this.sending = true
       let bodyFormData = new FormData()
       bodyFormData.append('from', this.getAddress())
 

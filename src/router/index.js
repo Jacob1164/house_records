@@ -6,7 +6,6 @@ import Records from '@/components/Records'
 import Register from '@/components/Register'
 import Login from '@/components/Login'
 import Signup from '@/components/Signup'
-import Claim from '@/components/Claim'
 
 Vue.use(Router)
 
@@ -42,11 +41,6 @@ export default new Router({
       path: '/account/signup',
       name: 'Signup',
       component: Signup
-    },
-    {
-      path: '/claim',
-      name: 'Claim',
-      component: Claim
     }
   ]
 })

@@ -19,13 +19,15 @@ export default {
   name: 'Home',
   data: () => ({
     search: null,
-    searched: null,
+    searched: [],
     marked: [],
     markers: [],
     infoWindows: [],
     places: [],
+    latLngs: []
   }),
   mounted () {
+    let self = this
     // create a map
     map = new google.maps.Map(document.getElementById('map'), {
       center: new google.maps.LatLng(41.693206, -86.228631),
@@ -35,7 +37,17 @@ export default {
       scaleControl: true,
       streetViewControl: false,
       rotateControl: false,
-      fullscreenControl: false
+      fullscreenControl: false,
+      styles: [{
+        featureType: "poi",
+        elementType: "labels",
+        stylers: [{
+          visibility: "off"
+        }]
+      }, {
+        featureType: "transit",
+        stylers: [{ "visibility": "off" }]
+      }]
     })
 
     // create autocomplete
@@ -57,15 +69,24 @@ export default {
           map.setZoom(6)
         } else if (place.types[0] == 'administrative_area_level_2') {
           map.setZoom(10)
+        } else if (self.latLngs.findIndex((item) => {
+          let status = (item.la == (Math.round(place.geometry.location.lat() * 10000000) / 10000000) && item.ln == (Math.round(place.geometry.location.lng() * 10000000) / 10000000))
+          console.log(item.la)
+          console.log(Math.round(place.geometry.location.lat() * 10000000) / 10000000)
+          console.log(item.ln)
+          console.log((Math.round(place.geometry.location.lng() * 10000000) / 10000000))
+          return status
+        }) != -1) {
+          map.setZoom(17)
         } else {
           map.setZoom(14)
         }
+
 
       }
     }, {passive: false})
 
     // listner for map moved
-    let self = this
     var timeout
     map.addListener('bounds_changed', function () {
       window.clearTimeout(timeout)
@@ -129,8 +150,13 @@ export default {
         if (self.searched[i].payload.inputs.lng_neg == 1) {
           lng *= -1
         }
+
         if (!self.marked.includes(self.searched[i].payload.inputs.addresss)) {
           self.marked.push(self.searched[i].payload.inputs.addresss)
+          self.latLngs.push({
+            la: lat,
+            ln: lng
+          })
           let marker = new google.maps.Marker({
             map: map,
             draggable: false,
@@ -140,7 +166,7 @@ export default {
           })
           self.markers.push(marker)
           var contentString = '<div class="i_content" style="color: black;"><h6>' + self.searched[i].payload.inputs.addresss + '</h6>'
-           + '<p>Date Built: ' + self.searched[i].payload.inputs.date + '</p><br>' + '<a href="/#/records/' + self.searched[i].payload.inputs.assetId + '"><u style="color: blue;">Get full house records</u></a>' + '</div>'
+           + '<p>Date Built: ' + self.searched[i].payload.inputs.date + '</p>' + '<a href="/#/records/' + self.searched[i].payload.inputs.assetId + '"><u style="color: blue;">Get full house records</u></a>' + '</div>'
 
           let infoWindow = new google.maps.InfoWindow({
             content: contentString

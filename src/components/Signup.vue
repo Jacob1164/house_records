@@ -5,12 +5,12 @@
       <div class="col-xl-6 col-lg-6 col-md-8 col-sm-10 col-12">
         <b-card bg-variant="light" class="post-card" title="Sign Up">
           <div class="row">
-            <div class="col-6">
+            <div class="col-12 col-md-6">
               <b-form-group description="First Name">
                 <b-form-input name="first" id="first" v-model="data.first" :disabled="sending"/>
               </b-form-group>
             </div>
-            <div class="col-6">
+            <div class="col-12 col-md-6">
               <b-form-group description="Last Name">
                 <b-form-input name="last" id="last" v-model="data.last" :disabled="sending"/>
               </b-form-group>
@@ -32,8 +32,7 @@
                   <option :value="null" selected disabled>Please select a role</option>
                   <option value="re">Real Estate Agent</option>
                   <option value="ia">Insurance Agent</option>
-                  <option value="in">Inspector</option>
-                  <option value="ho">Home Owner</option>
+                  <option value="in">Inspector/Government Assesor</option>
                 </b-form-select>
               </b-form-group>
             </div>

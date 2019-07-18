@@ -1,37 +1,36 @@
 <template>
   <div class="page-container unselectable">
-    <b-navbar variant="warning">
+    <b-navbar :variant="color" :sticky="true" toggleable="md">
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+      <b-navbar-brand>House Demo</b-navbar-brand>
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
-          <b-navbar-brand>House Demo</b-navbar-brand>
           <b-nav-item to="/">Home</b-nav-item>
           <b-nav-item to="/register">Register a House</b-nav-item>
           <b-nav-item v-if="loggedIn" to="/post">Add Records</b-nav-item>
-          <b-nav-item v-if="loggedIn && accountInfo.role == 'ho'" to="/claim">Claim Your House</b-nav-item>
         </b-navbar-nav>
 
         <b-navbar-nav class="ml-auto">
-          <b-nav-item v-if="loggedIn">
+          <b-nav-item v-if="loggedIn" class="d-none d-sm-none d-md-block">
             <b-button v-b-tooltip.hover title="Accountt" pill variant="outline-light" @click="setAccount(true)">
               <img class="icon" src="./components/icons/person.svg" alt="person">
             </b-button>
           </b-nav-item>
 
-          <b-nav-item>
+          <b-nav-item class="d-none d-sm-none d-md-block">
             <b-button v-b-tooltip.hover title="Info" pill variant="outline-light" @click="info = !info">
               <img class="icon" src="./components/icons/info.svg" alt="info">
             </b-button>
           </b-nav-item>
 
-          <b-nav-item>
-            <b-button v-b-tooltip.hover title="Wallet" pill variant="outline-light" @click="isWallet = !isWallet" v-if="hasWallet">
-              <div class="fill"><img class="icon fill" src="./components/icons/credit-card.svg" alt="creidt card"></div>
-            </b-button>
-            <b-button v-b-tooltip.hover title="Wallet" pill variant="outline-light" @click="isWallet = !isWallet" v-else>
+          <b-nav-item class="d-none d-sm-none d-md-block">
+            <b-button v-b-tooltip.hover title="Wallet" pill variant="outline-light" @click="isWallet = !isWallet">
               <img class="icon" src="./components/icons/credit-card.svg" alt="creidt card">
             </b-button>
           </b-nav-item>
+          <b-nav-item v-if="loggedIn" @click="setAccount(true)" class="d-block d-md-none">Account</b-nav-item>
+          <b-nav-item class="d-block d-md-none" @click="info = !info">Info</b-nav-item>
+          <b-nav-item class="d-block d-md-none" @click="isWallet = !isWallet">Wallet</b-nav-item>
         </b-navbar-nav>
         <b-navbar-nav class="ml">
           <b-nav-item v-if="loggedIn" id="logout" @click="logout()">Log Out</b-nav-item>
@@ -46,7 +45,7 @@
         <small>Use the map on the main page to find a registered house.</small>
         <br><small>If you click on a pin, you can go to a page with all the records for that house.</small>
         <br><small>Go the register a house page to add a new house to the map.</small>
-        <br><small>Login/Sign up as either a real estate agent, insurance agent, inspector, or home owner to add records to a house.</small>
+        <br><small>Login/Sign up as either a real estate agent, insurance agent, or inspector to add records to a house.</small>
       </div>
     </b-modal>
 
@@ -72,7 +71,7 @@
         <div>
           <h6>Restore your Ethereum Account with Seed</h6>
           <small>Please type your seed (12 mnemonic words) to restore</small><br>
-          <div class="md-layout-item md-size-70"> <!-- -->
+          <div class="md-layout-item md-size-70">
             <b-form-group>
               <label for="resotreSeed">Wallet Seed</label>
               <b-form-textarea id="resotreSeed" rows="2" max-rows="4" v-model="restoreSeed" placeholder="Wallet Seed" no-resize></b-form-textarea>
@@ -132,6 +131,9 @@
   .fill {
     fill: green;
   }
+  b-navbar {
+    height: 50px;
+  }
 </style>
 
 <script>
@@ -166,7 +168,8 @@ export default {
         role: null,
         displayRole: null
       },
-      loggedIn: false
+      loggedIn: false,
+      color: null
     }
   },
   methods: {
@@ -326,11 +329,17 @@ export default {
   mounted () {
     if (!localStorage.getItem('keystore')) {
       this.createWallet()
-      this.makeToast('We just created a wallet for you, check it out at the right-top corner : )', 'success', 'Ethereum Wallet')
+      this.makeToast('We just created a wallet for you, check it out at the right-top corner :)', 'success', 'Ethereum Wallet')
     }
     if(localStorage.getItem('loggedIn') == true) {
       this.loggedIn = true
     }
+    let num = Math.floor(Math.random() * 5)
+    if (num == 0) this.color = 'primary'
+    if (num == 1) this.color = 'danger'
+    if (num == 2) this.color = 'warning'
+    if (num == 3) this.color = 'success'
+    if (num == 4) this.color = 'info'
 
     this.getCurrentWallet()
   }

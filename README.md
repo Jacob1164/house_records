@@ -28,10 +28,11 @@ npm run dev
 * If you go to the link on a house's info window, you will be able to see a list of all transactions for that house.
 * On the register page, any person can type in an address and add the house to the list of registered houses.
 * There is a sign up and a log in page.
-* Once logged in as a specific role (Real estate agent, insurance agent, inspector, or home owner) the user can add the make their corresponding transaction to any registered house.
+* Once logged in as a specific role (Real estate agent, insurance agent, or inspector) the user can add the make their corresponding transaction to any registered house.
 * Additional features include:
-..* Google Maps Autocomplete on the home and register pages
-..* Google Maps Static in both map and street view on each house's page
-..* Not allowing the user to select a date in the future, or a date before the house was built for any non-registering transactions
-..* General protection against form misuse
-..* And of course: all files stored on SIMBA's Circle-of-Life Ethereum blockchain, ensuring security and reliability
+  * Google Maps Autocomplete on the home and register pages
+  * Google Maps Static in both map and street view on each house's page
+  * Not allowing the user to select a date in the future, or a date before the house was built for any non-registering transactions
+  * General protection against form misuse
+  * And of course: all files stored on SIMBA's Circle-of-Life Ethereum blockchain, ensuring security and reliability
+  * Styled using Vue+Bootstrap

@@ -3,28 +3,15 @@ pragma solidity ^0.4.24;
 contract Application {
     function Application() public {}
     enum Assets {
-        House,
         User,
-        Claim
+        House
     }
-    Assets _new_house = Assets.House;
     Assets _create_user = Assets.User;
     Assets _improvement = Assets.House;
     Assets _house_sale = Assets.House;
     Assets _appraisal = Assets.House;
     Assets _accident = Assets.House;
-    Assets _claim = Assets.Claim;
-
-    function new_house (
-        string assetId,
-        string addresss,
-        string date,
-        string builder,
-        int256 lat,
-        int256 lng,
-        int256 lat_neg,
-        int256 lng_neg)
-    public {}
+    Assets _new_house = Assets.House;
 
     function create_user (
         string assetId,
@@ -38,11 +25,14 @@ contract Application {
 
     function improvement (
         string assetId,
-        string owner,
         string improvement,
         string notes,
         string date,
-        int256 value_added)
+        int256 value_added,
+        string bedrooms,
+        string bathrooms,
+        string area,
+        string acres)
     public {}
 
     function house_sale (
@@ -72,10 +62,18 @@ contract Application {
         int256 estimated_damages)
     public {}
 
-    function claim (
+    function new_house (
         string assetId,
         string addresss,
-        string house_assetId
-        int256 active)
+        string date,
+        string builder,
+        int256 lat,
+        int256 lng,
+        int256 lat_neg,
+        int256 lng_neg,
+        string bedrooms,
+        string bathrooms,
+        string area,
+        string acres)
     public {}
 }

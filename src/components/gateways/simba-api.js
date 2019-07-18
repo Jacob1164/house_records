@@ -1,9 +1,9 @@
 import axios from 'axios'
 
 const HTTP = axios.create({
-  baseURL: 'https://api.simbachain.com/v1/houses_claim/',
+  baseURL: 'https://api.simbachain.com/v1/house_records1/',
   headers: {
-    'APIKEY': '2db3c5274abbc9ab958fed79ff3474905f7fedf26a953fc27fba69356fcaa6a9'
+    'APIKEY': '[YOUR API KEY HRER]'
   }
 })
 
