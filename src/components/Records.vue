@@ -88,14 +88,15 @@
         </div>
         <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-12">
           <div><img :src="img_url"/></div><br>
-          <div><img :src="street_url"/></div>
+          <div><img :src="street_url"/></div><br>
+          <b-button class="text-center col-12" variant="primary" @click="makePdf()">Download the records (PDF)</b-button>
         </div>
       </div>
     </div>
     <b-modal v-model="showInfoDialog" title="Transaction Details" :ok-only="true">
       <tree-view :data="infoData" :options="{maxDepth: 1}"></tree-view>
     </b-modal>
-    <b-modal v-if="!recentReno" v-model="info" title="House Info" :ok-only="true">
+    <b-modal v-if="housesLoaded && !recentReno" v-model="info" title="House Info" :ok-only="true">
       <div>
         <div><strong># of Bedrooms:</strong> {{ displays[0].payload.inputs.bedrooms }}</div>
         <div><strong># of Bathrooms:</strong> {{ displays[0].payload.inputs.bathrooms }}</div>
@@ -103,7 +104,7 @@
         <div><strong># of Acres on Property:</strong> {{ displays[0].payload.inputs.acres }}</div>
       </div>
     </b-modal>
-    <b-modal v-else v-model="info" title="House Info" :ok-only="true">
+    <b-modal v-if="recentReno" v-model="info" title="House Info" :ok-only="true">
       <div>
         <div><strong># of Bedrooms:</strong> {{ recentReno.payload.inputs.bedrooms }}</div>
         <div><strong># of Bathrooms:</strong> {{ recentReno.payload.inputs.bathrooms }}</div>
@@ -134,7 +135,8 @@ export default {
       filter: 'All',
       filterCode: 'a',
       searchType: 'Name',
-      query: null
+      query: null,
+      housesLoaded: false
     }
   },
 
@@ -146,12 +148,12 @@ export default {
       simbaApi.getData(url)
         .then(function (response) {
           self.records = response.data.results
-          self.recentReno = self.records.find((result) => {
-            return result.payload.method == 'improvement'
-          })
           // this little function to sort by date comes from Phrogz on Stack Overflow
           self.records.sort(function(a,b){
             return new Date(b.payload.inputs.date) - new Date(a.payload.inputs.date);
+          })
+          self.recentReno = self.records.find((result) => {
+            return result.payload.method == 'improvement'
           })
           self.records = self.records.reverse()
           self.done()
@@ -159,6 +161,7 @@ export default {
     } catch (e) {
       console.log(e)
     }
+
   },
 
   methods: {
@@ -223,8 +226,12 @@ export default {
         lng = this.records[0].payload.inputs.lng / 10000000
       }
       this.img_url = 'https://maps.googleapis.com/maps/api/staticmap?center=' + this.records[0].payload.inputs.addresss +
-      '&zoom=18&size=1600x1600&maptype=roadmap&markers=color:red%7Clabel:%7C' + lat + ',' + lng + '&key=AIzaSyBNGgSXjtrJCMkZaqoxo2KGDe-DdJUVMa0'
-      this.street_url = 'https://maps.googleapis.com/maps/api/streetview?location=' + lat + ',' + lng + '&size=1600x1600&key=AIzaSyBNGgSXjtrJCMkZaqoxo2KGDe-DdJUVMa0'
+      '&zoom=18&size=1600x1600&maptype=roadmap&markers=color:red%7Clabel:%7C' + lat + ',' + lng + '&key=KEY_HERE'
+      this.street_url = 'https://maps.googleapis.com/maps/api/streetview?location=' + lat + ',' + lng + '&size=1600x1600&key=KEY_HERE'
+    },
+
+    makePdf () {
+      pdfMake.createPdf(this.docDefinition).download(this.records[0].payload.inputs.addresss)
     }
   },
 
@@ -323,6 +330,7 @@ export default {
           }
         }
       }
+      this.housesLoaded = true
       return type
     },
 
@@ -332,9 +340,194 @@ export default {
         ids.push(this.displays[i].id)
       }
       return ids
+    },
+
+    saleRows: function () {
+      let hold = [['Date', 'Previous Owner', 'New Owner', 'Price']]
+      for (let i = 0; i < this.records.length; i++) {
+        if (this.records[i].payload.method == 'house_sale') {
+          let entry = []
+          entry.push(this.records[i].payload.inputs.date)
+          entry.push(this.records[i].payload.inputs.prev_owner)
+          entry.push(this.records[i].payload.inputs.new_owner)
+          entry.push(this.formatNumber(this.records[i].payload.inputs.price))
+          hold.push(entry)
+        }
+      }
+      return hold
+    },
+
+    appraisalRows: function () {
+      let hold = [['Date', 'Inspector', 'Value', 'Notes']]
+      for (let i = 0; i < this.records.length; i++) {
+        if (this.records[i].payload.method == 'appraisal') {
+          let entry = []
+          entry.push(this.records[i].payload.inputs.date)
+          entry.push(this.records[i].payload.inputs.inspector)
+          entry.push(this.formatNumber(this.records[i].payload.inputs.value))
+          entry.push(this.records[i].payload.inputs.notes)
+          hold.push(entry)
+        }
+      }
+      return hold
+    },
+
+    improvementRows: function () {
+      let hold = [['Date', 'Improvement Made', 'Value Added', 'Notes']]
+      for (let i = 0; i < this.records.length; i++) {
+        if (this.records[i].payload.method == 'improvement') {
+          let entry = []
+          entry.push(this.records[i].payload.inputs.date)
+          entry.push(this.records[i].payload.inputs.improvement)
+          entry.push(this.formatNumber(this.records[i].payload.inputs.value_added))
+          entry.push(this.records[i].payload.inputs.notes)
+          hold.push(entry)
+        }
+      }
+      return hold
+    },
+
+    accidentRows: function () {
+      let hold = [['Date', 'Incident', 'Estimated Damages', 'Notes']]
+      for (let i = 0; i < this.records.length; i++) {
+        if (this.records[i].payload.method == 'accident') {
+          let entry = []
+          entry.push(this.records[i].payload.inputs.date)
+          entry.push(this.records[i].payload.inputs.incident)
+          entry.push(this.formatNumber(this.records[i].payload.inputs.estimated_damages))
+          entry.push(this.records[i].payload.inputs.notes)
+          hold.push(entry)
+        }
+      }
+      return hold
+    },
+
+    generalInfo () {
+      if (!this.recentReno) {
+        let ul = [
+          {text: [{text: 'Finished Area: ', bold: true}, this.records[0].payload.inputs.area]},
+          {text: [{text: 'Acres: ', bold: true}, this.records[0].payload.inputs.acres]},
+          {text: [{text: 'Bedrooms: ', bold: true}, this.records[0].payload.inputs.bedrooms]},
+          {text: [{text: 'Bathrooms: ', bold: true}, this.records[0].payload.inputs.bathrooms]}
+        ]
+        return ul
+      } else {
+        let l = [
+          {text: [{text: 'Finished Area: ', bold: true}, this.recentReno.payload.inputs.area]},
+          {text: [{text: 'Acres: ', bold: true}, this.recentReno.payload.inputs.acres]},
+          {text: [{text: 'Bedrooms: ', bold: true}, this.recentReno.payload.inputs.bedrooms]},
+          {text: [{text: 'Bathrooms: ', bold: true}, this.recentReno.payload.inputs.bathrooms]}
+        ]
+        return l
+      }
+    },
+
+    docDefinition: function () {
+      return {
+      content: [
+        {text: 'House Records: ' + this.records[0].payload.inputs.addresss, style: 'header'},
+        {text: 'General Information:', style: 'subhead'},
+        {ul: this.generalInfo},
+        {text: '\nHouse Sales', style: 'subhead'},
+        {
+          style: 'table',
+          table: {
+            headerRows: 1,
+            widths: [75, '*', '*', '*'],
+            body: this.saleRows
+          },
+          layout: {
+      fillColor: function (rowIndex, node, columnIndex) {
+        return (rowIndex === 0) ? '#CCCCCC' : null;
+      }
     }
+        },
+
+        {text: 'Appraisals', style: 'subhead'},
+        {
+          style: 'table',
+          table: {
+            headerRows: 1,
+            widths: [75, '*', '*', 350],
+            body: this.appraisalRows
+          },
+          layout: {
+      fillColor: function (rowIndex, node, columnIndex) {
+        return (rowIndex === 0) ? '#CCCCCC' : null;
+      }
+    }
+        },
+
+        {text: 'House Improvements', style: 'subhead'},
+        {
+          style: 'table',
+          table: {
+            headerRows: 1,
+            widths: [75, '*', '*', 350],
+            body: this.improvementRows
+          },
+          layout: {
+      fillColor: function (rowIndex, node, columnIndex) {
+        return (rowIndex === 0) ? '#CCCCCC' : null;
+      }
+    }
+        },
+
+      {text: 'For Insurance Companies Only:', style: 'note'},
+
+      {text: 'Accidents', style: 'subhead'},
+        {
+          style: 'table',
+          table: {
+            headerRows: 1,
+            widths: [75, '*', '*', 350],
+            body: this.accidentRows
+          },
+          layout: {
+            fillColor: function (rowIndex, node, columnIndex) {
+              return (rowIndex === 0) ? '#CCCCCC' : null;
+            }
+          }
+        },
+      ],
+      styles: {
+        header: {
+          fontSize: 18,
+          bold: true,
+          margin: [0, 0, 0, 15]
+        },
+        subhead: {
+          fontSize: 14,
+          bold: true,
+          margin: [0, 0, 0, 5]
+        },
+        table: {
+            margin: [0, 0, 0, 20]
+        },
+        note: {
+            italics: true,
+            color: 'gray',
+            fontSize: 14
+        },
+        margin: {
+            margin: [0, 0, 0, 20]
+        },
+        little: {
+          italics: true,
+          color: 'gray',
+          fontSize: 10
+        }
+      },
+      pageOrientation: 'landscape',
+      footer: {
+        columns: [
+          {text: 'Asset ID: ' + this.records[0].payload.inputs.assetId, alignment: 'center', style: 'little'}
+        ]
+      }
     }
   }
+  }
+}
 </script>
 
 <style>

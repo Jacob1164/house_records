@@ -7,10 +7,15 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import App from './App'
 import router from './router'
 import TreeView from 'vue-json-tree-view'
+import pdfMake from 'pdfmake/build/pdfmake'
+import pdfFonts from 'pdfmake/build/vfs_fonts'
+pdfMake.vfs = pdfFonts.pdfMake.vfs
 
 Vue.config.productionTip = false
 Vue.use(BootstrapVue)
 Vue.use(TreeView)
+Vue.use(pdfMake)
+Vue.use(pdfFonts)
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

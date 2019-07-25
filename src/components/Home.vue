@@ -71,18 +71,12 @@ export default {
           map.setZoom(10)
         } else if (self.latLngs.findIndex((item) => {
           let status = (item.la == (Math.round(place.geometry.location.lat() * 10000000) / 10000000) && item.ln == (Math.round(place.geometry.location.lng() * 10000000) / 10000000))
-          console.log(item.la)
-          console.log(Math.round(place.geometry.location.lat() * 10000000) / 10000000)
-          console.log(item.ln)
-          console.log((Math.round(place.geometry.location.lng() * 10000000) / 10000000))
           return status
         }) != -1) {
           map.setZoom(17)
         } else {
           map.setZoom(14)
         }
-
-
       }
     }, {passive: false})
 

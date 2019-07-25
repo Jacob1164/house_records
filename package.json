@@ -22,6 +22,7 @@
     "file-saver": "^2.0.2",
     "jquery": "^3.4.1",
     "password-hash": "^1.2.2",
+    "pdfmake": "^0.1.57",
     "portal-vue": "^2.1.5",
     "secure-ls": "^1.2.1",
     "uuid": "^3.3.2",

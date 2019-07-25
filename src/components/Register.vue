@@ -196,11 +196,12 @@ export default {
       this.form1.lng = null
       this.form1.lat_neg = 0
       this.form1.lng_neg = 0
+      this.form1.date = null
       this.date = null
-      this.bedrooms = null
-      this.bathrooms = null
-      this.area = null
-      this.acres = null
+      this.form1.bedrooms = null
+      this.form1.bathrooms = null
+      this.form1.area = null
+      this.form1.acres = null
     },
 
     // posts all the data to Simba Chain
@@ -224,14 +225,15 @@ export default {
         this.date = null
         return
       } else {
-        this.date = new Date(this.date)
+        this.form1.date = new Date(this.date)
+        this.form1.date = this.form1.date.toString().substring(4,10) + ',' + this.form1.date.toString().substring(10,15)
       }
 
       if(isNaN(this.form1.bedrooms) || isNaN(this.form1.bathrooms) || isNaN(this.form1.area) || isNaN(this.form1.acres)) {
         window.alert('# of bedrooms, bathrooms, acres and square footage must all be a numerical value.')
         return
       }
-
+      console.log('Good Data')
       this.sending = true
       let bodyFormData = new FormData()
       bodyFormData.append('from', this.getAddress())
