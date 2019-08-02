@@ -46,12 +46,12 @@
             <div class="row">
               <div class="col-sm-6 col-12">
                 <b-form-group description="Real Estate Agent's Name">
-                  <b-form-input name="real_estate_agent" id="real_estate_agent" v-model="form2.real_estate_agent" :disabled="sending" />
+                  <b-form-input name="real_estate_agent" id="real_estate_agent" v-model="form2.real_estate_agent" disabled />
                 </b-form-group>
               </div>
               <div class="col-sm-6 col-12">
                 <b-form-group description="Price">
-                  <div class="input-group mb-3">
+                  <div class="input-group">
                     <div class="input-group-prepend">
                       <span class="input-group-text">$</span>
                     </div>
@@ -71,7 +71,7 @@
               </div>
               <div class="col-12 col-md-6 col-lg-4">
                 <b-form-group description="Estimated Damages ($)">
-                  <div class="input-group mb-3">
+                  <div class="input-group">
                     <div class="input-group-prepend">
                       <span class="input-group-text">$</span>
                     </div>
@@ -83,7 +83,7 @@
             <div class="row">
               <div class="col-12 col-sm-6">
                 <b-form-group description="Insurance Agent's Name">
-                  <b-form-input name="insurance_agent" id="insurance_agent" v-model="form3.insurance_agent" :disabled="sending" />
+                  <b-form-input name="insurance_agent" id="insurance_agent" v-model="form3.insurance_agent" disabled />
                 </b-form-group>
               </div>
               <div class="col-12 col-sm-6">
@@ -105,12 +105,12 @@
             <div class="row">
               <div class="col-12 col-md-6 col-lg-8">
                 <b-form-group description="Inspector's Name">
-                  <b-form-input name="inspector" id="inspector" v-model="form4.inspector" :disabled="sending" />
+                  <b-form-input name="inspector" id="inspector" v-model="form4.inspector" disabled/>
                 </b-form-group>
               </div>
               <div class=" col-12 col-md-6 col-lg-4">
                 <b-form-group description="House's Value">
-                  <div class="input-group mb-3">
+                  <div class="input-group">
                     <div class="input-group-prepend">
                       <span class="input-group-text">$</span>
                     </div>
@@ -165,7 +165,7 @@
               </div>
               <div class="col-12 col-sm-6">
                 <b-form-group description="Value Added to House">
-                  <div class="input-group mb-3">
+                  <div class="input-group">
                     <div class="input-group-prepend">
                       <span class="input-group-text">$</span>
                     </div>
@@ -230,6 +230,10 @@ export default {
   mounted () {
     this.changePost(localStorage.getItem('role'))
     this.loggedIn = this.$parent.loggedIn
+    this.form4.inspector = this.$parent.accountInfo.first + ' ' + this.$parent.accountInfo.last
+    this.form3.insurance_agent = this.$parent.accountInfo.first + ' ' + this.$parent.accountInfo.last
+    this.form2.real_estate_agent = this.$parent.accountInfo.first + ' ' + this.$parent.accountInfo.last
+
 
     // Get current houses
     this.getHouses()

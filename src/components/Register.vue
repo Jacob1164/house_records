@@ -121,18 +121,16 @@ export default {
       geocoder.geocode( { 'address': address}, function(results, status) {
         if (status == 'OK') {
           self.form1.assetId = results[0].place_id
-          var send_lat = Math.round(results[0].geometry.location.lat() * 10000000)
-          var send_lng = Math.round(results[0].geometry.location.lng() * 10000000)
 
           // for some reason, Simba does not accept negative integers
           // the following sets a separate boolean to true if the value is negative
           // (and makes it positive so Simba will accept it)
-          self.form1.lat = Math.abs(send_lat)
-          self.form1.lng = Math.abs(send_lng)
-          if (send_lat < 0) {
+          self.form1.lat = Math.abs(Math.round(results[0].geometry.location.lat() * 10000000))
+          self.form1.lng = Math.abs(Math.round(results[0].geometry.location.lng() * 10000000))
+          if (results[0].geometry.location.lat() < 0) {
             self.form1.lat_neg = 1
           }
-          if (send_lng < 0) {
+          if (results[0].geometry.location.lng() < 0) {
             self.form1.lng_neg = 1
           }
         } else {
@@ -233,12 +231,10 @@ export default {
         window.alert('# of bedrooms, bathrooms, acres and square footage must all be a numerical value.')
         return
       }
-      console.log('Good Data')
       this.sending = true
       let bodyFormData = new FormData()
       bodyFormData.append('from', this.getAddress())
 
-      this.form1.date = this.date.toString().substring(4,10) + ',' + this.date.toString().substring(10,15)
       for (let k in this.form1) {
         if (this.form1.hasOwnProperty(k)) {
           bodyFormData.append(k, this.form1[k])

@@ -132,7 +132,8 @@
     fill: green;
   }
   b-navbar {
-    height: 50px;
+    min-height: 30px;
+    padding: 0px;
   }
 </style>
 

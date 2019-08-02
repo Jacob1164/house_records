@@ -1,12 +1,10 @@
 <template>
   <div id="div_map">
-    <b-card>
-      <div>
-        <small class="text-muted">Enter a location. Don't see the house you're looking for? Register it now!</small>
-        <b-form-input size="sm" name="search" id="search" v-model="search" placeholder="Enter a location. Don't see the house you're looking for? Register it now!"/>
-        <div id="map" style="height:79vh; width:100%;"></div>
-      </div>
-    </b-card>
+    <div>
+      <small class="text-muted">Enter a location. Don't see the house you're looking for? Register it now!</small>
+      <b-form-input size="sm" name="search" id="search" v-model="search" placeholder="Enter a location!"/>
+      <div id="map" style="height:82vh; width:100%;"></div>
+    </div>
   </div>
 </template>
 
@@ -177,7 +175,8 @@ export default {
         }
       }
       var markerCluster = new MarkerClusterer(map, self.markers,
-            {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'})
+            {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m',
+             maxZoom: 16})
     },
 
     // makes sure only one info window is open at a time
@@ -192,5 +191,9 @@ export default {
 <style lang="css" scoped>
 #search {
   margin-bottom: 5px;
+}
+#div_map {
+  margin-left: 7px;
+  margin-right: 5px;
 }
 </style>

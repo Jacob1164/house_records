@@ -89,7 +89,8 @@
         <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4 col-12">
           <div><img :src="img_url"/></div><br>
           <div><img :src="street_url"/></div><br>
-          <b-button class="text-center col-12" variant="primary" @click="makePdf()">Download the records (PDF)</b-button>
+          <b-button class="text-center col-12" variant="primary" @click="makePdf()">Download the records (PDF)</b-button><br><br>
+          <b-button v-if="show_estimate" variant="white" class="text-center col-12" @click="estimate_info = !estimate_info"><h5>Estimated House Value: {{formatNumber(value)}}</h5></b-button>
         </div>
       </div>
     </div>
@@ -110,6 +111,13 @@
         <div><strong># of Bathrooms:</strong> {{ recentReno.payload.inputs.bathrooms }}</div>
         <div><strong>Square Footage:</strong> {{ recentReno.payload.inputs.area }}</div>
         <div><strong># of Acres on Property:</strong> {{ recentReno.payload.inputs.acres }}</div>
+      </div>
+    </b-modal>
+    <b-modal v-if="show_estimate" v-model="estimate_info" title="House Value Estimate" :ok-only="true">
+      <div>
+        <p>This number is an estimate that the site creates. It is based on the most recent sale price, or the
+          most recent appraisal. The number is adjusted slightly for any accidents or renovations that have occured
+          since the most recent sale or appraisal.</p>
       </div>
     </b-modal>
   </div>
@@ -136,7 +144,10 @@ export default {
       filterCode: 'a',
       searchType: 'Name',
       query: null,
-      housesLoaded: false
+      housesLoaded: false,
+      value: null,
+      estimate_info: false,
+      show_estimate: false
     }
   },
 
@@ -156,6 +167,26 @@ export default {
             return result.payload.method == 'improvement'
           })
           self.records = self.records.reverse()
+
+          for (let i = 0; i < self.records.length; i++) {
+            if (self.records[i].payload.method == 'house_sale') {
+              self.value = self.records[i].payload.inputs.price
+              self.show_estimate = true
+            }
+            else if (self.records[i].payload.method == 'appraisal') {
+              self.value = self.records[i].payload.inputs.value * 1.1
+              self.estimate = true
+            }
+            else if (self.records[i].payload.method == 'accident') {
+              self.value -= self.records[i].payload.inputs.estimated_damages * 0.4
+            }
+            else if (self.records[i].payload.method == 'improvement') {
+              self.value += self.records[i].payload.inputs.value_added * 0.9
+            }
+          }
+          if (self.records.length > 1) {
+            self.value = self.value.toFixed(2)
+          }
           self.done()
         })
     } catch (e) {
@@ -226,8 +257,8 @@ export default {
         lng = this.records[0].payload.inputs.lng / 10000000
       }
       this.img_url = 'https://maps.googleapis.com/maps/api/staticmap?center=' + this.records[0].payload.inputs.addresss +
-      '&zoom=18&size=1600x1600&maptype=roadmap&markers=color:red%7Clabel:%7C' + lat + ',' + lng + '&key=KEY_HERE'
-      this.street_url = 'https://maps.googleapis.com/maps/api/streetview?location=' + lat + ',' + lng + '&size=1600x1600&key=KEY_HERE'
+      '&zoom=18&size=1600x1600&maptype=roadmap&markers=color:red%7Clabel:%7C' + lat + ',' + lng + '&key=AIzaSyCvWODDoJd4WT9v5b_s3i3oTg3muDMYCpU'
+      this.street_url = 'https://maps.googleapis.com/maps/api/streetview?location=' + lat + ',' + lng + '&size=1600x1600&key=AIzaSyCvWODDoJd4WT9v5b_s3i3oTg3muDMYCpU'
     },
 
     makePdf () {
@@ -408,7 +439,8 @@ export default {
           {text: [{text: 'Finished Area: ', bold: true}, this.records[0].payload.inputs.area]},
           {text: [{text: 'Acres: ', bold: true}, this.records[0].payload.inputs.acres]},
           {text: [{text: 'Bedrooms: ', bold: true}, this.records[0].payload.inputs.bedrooms]},
-          {text: [{text: 'Bathrooms: ', bold: true}, this.records[0].payload.inputs.bathrooms]}
+          {text: [{text: 'Bathrooms: ', bold: true}, this.records[0].payload.inputs.bathrooms]},
+          {text: [{text: 'Date Built: ', bold: true}, this.records[0].payload.inputs.date]}
         ]
         return ul
       } else {
@@ -416,7 +448,8 @@ export default {
           {text: [{text: 'Finished Area: ', bold: true}, this.recentReno.payload.inputs.area]},
           {text: [{text: 'Acres: ', bold: true}, this.recentReno.payload.inputs.acres]},
           {text: [{text: 'Bedrooms: ', bold: true}, this.recentReno.payload.inputs.bedrooms]},
-          {text: [{text: 'Bathrooms: ', bold: true}, this.recentReno.payload.inputs.bathrooms]}
+          {text: [{text: 'Bathrooms: ', bold: true}, this.recentReno.payload.inputs.bathrooms]},
+          {text: [{text: 'Date Built: ', bold: true}, this.records[0].payload.inputs.date]}
         ]
         return l
       }
