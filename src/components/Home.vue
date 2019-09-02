@@ -84,39 +84,15 @@ export default {
       window.clearTimeout(timeout)
       timeout = window.setTimeout(function () {
         var bounds =  map.getBounds();
-        self.getHomes(Math.round(bounds.ga.j * 10000000), Math.round(bounds.ga.l * 10000000), Math.round(bounds.na.j * 10000000), Math.round(bounds.na.l * 10000000))
+        self.getHomes()
       }, 200);
     }, {passive: false})
   },
   methods: {
     // get data from SIMBA Chain
-    getHomes (lng_min, lng_max, lat_min, lat_max,) {
+    getHomes () {
       // constructs the GET url for simba
       var url = 'new_house/?'
-      if (lat_min < 0 && lat_max < 0) {
-        url += ('lat_lte=' + Math.abs(lat_min) + '&lat_gte=' + Math.abs(lat_max) + '&lat_neg_equals=1')
-      } else if (!(lat_min < 0 && lat_max < 0) && (lat_min < 0 || lat_max < 0)) {
-        if (lat_min > lat_max) {
-          url += ('lat_lte=' + Math.abs(lat_min))
-        } else {
-          url += ('lat_lte=' + Math.abs(lat_max))
-        }
-      } else {
-        url += ('lat_gte=' + lat_min + '&lat_lte=' +lat_max + '&lat_neg_equals=0')
-      }
-
-      if (lng_min < 0 && lng_max < 0) {
-        url += ('&lng_lte=' + Math.abs(lng_min) + '&lng_gte=' + Math.abs(lng_max) + '&lng_neg_equals=1')
-      } else if (!(lng_min < 0 && lng_max < 0) && (lng_min < 0 || lng_max < 0)) { // if one is positive and one is negative
-        if (lng_min > lng_max) {
-          url += ('&lng_lte=' + Math.abs(lng_min))
-        } else {
-          url += ('&lng_lte=' + Math.abs(lat_max))
-        }
-      } else {
-        url += ('&lng_gte=' + lng_min + '&lng_lte=' +lng_max + '&lng_neg_equals=0')
-      }
-
       this.searched = []
       let self = this
       try {
